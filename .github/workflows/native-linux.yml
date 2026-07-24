@@ -37,7 +37,7 @@ jobs:
         run: >-
           pacman -S --noconfirm --needed
           git cmake ninja extra-cmake-modules
-          qt6-base qt6-webengine qt6-svg layer-shell-qt
+          qt6-base qt6-webengine qt6-svg qt6-imageformats layer-shell-qt
           kglobalaccel kpackage kconfig
           opencv tesseract tesseract-data-eng tesseract-data-rus
           nodejs npm yarn curl file patchelf appstream
