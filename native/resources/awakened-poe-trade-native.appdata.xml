@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id>io.github.awakened_poe_trade.Native</id>
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>MIT</project_license>
+  <name>Awakened PoE Trade Native</name>
+  <summary>Native Linux Path of Exile trade overlay</summary>
+  <description>
+    <p>
+      A native Qt and KDE host for the Awakened PoE Trade interface, with
+      Wayland overlays, global shortcuts, tray integration, trade lookup,
+      clipboard actions, game-log tracking, Heist OCR, and native updates.
+    </p>
+  </description>
+  <launchable type="desktop-id">awakened-poe-trade-native.desktop</launchable>
+  <developer id="io.github.awakened_poe_trade">
+    <name>Awakened PoE Trade and Native Contributors</name>
+  </developer>
+  <url type="homepage">https://github.com/JuanchiBruzzone/awakened-poe-trade-native</url>
+  <url type="bugtracker">https://github.com/JuanchiBruzzone/awakened-poe-trade-native/issues</url>
+  <url type="vcs-browser">https://github.com/JuanchiBruzzone/awakened-poe-trade-native</url>
+  <content_rating type="oars-1.1"/>
+</component>

@@ -1,0 +1,108 @@
+name: Native release
+
+permissions:
+  contents: write
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - master
+    paths:
+      - native/VERSION
+
+concurrency:
+  group: native-release
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    container: archlinux:base-devel
+    steps:
+      - name: Update package database
+        run: pacman -Syu --noconfirm
+
+      - name: Install dependencies
+        run: >-
+          pacman -S --noconfirm --needed
+          git cmake ninja extra-cmake-modules
+          qt6-base qt6-webengine layer-shell-qt
+          kglobalaccel kpackage kconfig
+          opencv tesseract tesseract-data-eng tesseract-data-rus
+          nodejs npm curl file patchelf appstream github-cli
+
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Validate release version
+        id: version
+        shell: bash
+        run: |
+          version="$(tr -d '[:space:]' < native/VERSION)"
+          if [[ ! "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+-native\.[0-9]+$ ]]; then
+            echo "Invalid native/VERSION: $version" >&2
+            exit 1
+          fi
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          echo "tag=v$version" >> "$GITHUB_OUTPUT"
+
+      - name: Verify tag is new
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ steps.version.outputs.tag }}
+        run: |
+          if gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            echo "Release $TAG already exists; bump native/VERSION first." >&2
+            exit 1
+          fi
+
+      - name: Verify source and metadata
+        run: |
+          python scripts/check-upstream-contract.py --require-complete
+          appstreamcli validate --no-net native/resources/awakened-poe-trade-native.appdata.xml
+
+      - name: Build renderer and native host
+        env:
+          APP_VERSION: ${{ steps.version.outputs.version }}
+          UPDATE_REPOSITORY: ${{ github.repository }}
+        run: ./build-native.sh
+
+      - name: Download AppImage packaging tools
+        run: |
+          curl -fL -o linuxdeploy-x86_64.AppImage https://github.com/linuxdeploy/linuxdeploy/releases/download/continuous/linuxdeploy-x86_64.AppImage
+          curl -fL -o linuxdeploy-plugin-qt-x86_64.AppImage https://github.com/linuxdeploy/linuxdeploy-plugin-qt/releases/download/continuous/linuxdeploy-plugin-qt-x86_64.AppImage
+          curl -fL -o runtime-x86_64 https://github.com/AppImage/type2-runtime/releases/download/continuous/runtime-x86_64
+          chmod +x linuxdeploy-x86_64.AppImage linuxdeploy-plugin-qt-x86_64.AppImage
+
+      - name: Package AppImage
+        env:
+          APP_VERSION: ${{ steps.version.outputs.version }}
+          SKIP_BUILD: 1
+          APPIMAGE_EXTRACT_AND_RUN: 1
+          LINUXDEPLOY: ${{ github.workspace }}/linuxdeploy-x86_64.AppImage
+          QT_PLUGIN: ${{ github.workspace }}/linuxdeploy-plugin-qt-x86_64.AppImage
+          APPIMAGE_RUNTIME: ${{ github.workspace }}/runtime-x86_64
+        run: ./package-appimage.sh
+
+      - name: Verify release artifact
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          artifact="native/build/Awakened-PoE-Trade-Native-$VERSION-x86_64.AppImage"
+          sha256sum -c "$artifact.sha256"
+          output="$(APPIMAGE_EXTRACT_AND_RUN=1 "$artifact" --version)"
+          [[ "$output" == *"$VERSION"* ]]
+
+      - name: Publish GitHub release and tag
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.version.outputs.tag }}
+          target_commitish: ${{ github.sha }}
+          name: Awakened PoE Trade Native ${{ steps.version.outputs.version }}
+          generate_release_notes: true
+          make_latest: true
+          files: |
+            native/build/Awakened-PoE-Trade-Native-*.AppImage
+            native/build/Awakened-PoE-Trade-Native-*.AppImage.sha256

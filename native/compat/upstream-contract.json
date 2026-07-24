@@ -1,0 +1,27 @@
+{
+  "upstream": {
+    "repository": "https://github.com/SnosMe/awakened-poe-trade.git",
+    "commit": "fa31bfbbe99e04e386b4af2d71d633e2b6823c0f"
+  },
+  "watchedTrees": {
+    "main/src": "63e1237cbb0fa7a3bc9b52bdf2c7963734ce0894200552ebef7ff37b225d83e3",
+    "ipc": "463585623a79b80639707e80ba541606d685d545ecfcee7910d6dbc1a4264ca2"
+  },
+  "capabilities": {
+    "http-static-config-uploads-proxy": "implemented",
+    "websocket-event-transport": "implemented",
+    "config-and-file-locations": "implemented",
+    "system-tray": "implemented",
+    "global-shortcuts": "implemented",
+    "clipboard-item-capture": "implemented",
+    "game-config-and-log-watchers": "implemented",
+    "wayland-layer-shell-overlay": "implemented",
+    "kwin-game-focus-tracking": "implemented",
+    "overlay-focus-and-visibility": "implemented",
+    "embedded-trade-browser": "implemented",
+    "exact-chat-entry-sequences": "implemented",
+    "ctrl-wheel-stash-navigation": "implemented",
+    "kwin-active-window-screenshot-and-heist-ocr": "implemented",
+    "native-appimage-release-updater": "implemented"
+  }
+}

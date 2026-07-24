@@ -34,6 +34,39 @@ import HotkeysGeneric, { HotkeySchema } from '../settings/HotkeysGeneric.vue'
 
 const props = defineProps(configProp())
 
+function lockedPriceHotkey (widget: PriceCheckWidget) {
+  function parts () {
+    const values = (widget.hotkeyLocked || '')
+      .split('+')
+      .map(value => value.trim())
+      .filter(Boolean)
+    return {
+      modifier: values.find(value => ['Ctrl', 'Alt', 'Shift'].includes(value)) || 'Ctrl',
+      key: values.find(value => !['Ctrl', 'Alt', 'Shift'].includes(value)) || null
+    }
+  }
+
+  return {
+    modKey: {
+      get value () {
+        return parts().modifier
+      },
+      set value (modifier: string | null) {
+        const key = parts().key
+        widget.hotkeyLocked = modifier && key ? `${modifier} + ${key}` : null
+      }
+    },
+    nonModKey: {
+      get value () {
+        return parts().key
+      },
+      set value (key: string | null) {
+        widget.hotkeyLocked = key ? `${parts().modifier} + ${key}` : null
+      }
+    }
+  }
+}
+
 const hotkeys = computed<HotkeySchema[]>(() => {
   const priceCheckWidget = findWidget<PriceCheckWidget>('price-check', props.config)!
   const itemCheckWidget = findWidget<ItemCheckWidget>('item-check', props.config)!
@@ -48,7 +81,7 @@ const hotkeys = computed<HotkeySchema[]>(() => {
       }
     }, {
       translationKey: 'price_check.hotkey_locked',
-      config: _configModelValue(priceCheckWidget, 'hotkeyLocked')
+      config: lockedPriceHotkey(priceCheckWidget)
     }]
   }, {
     translationKey: 'settings.overlay',

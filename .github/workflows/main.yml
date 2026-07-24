@@ -1,14 +1,7 @@
-name: Build
+name: Upstream Electron compatibility
 
 on:
-  push:
-    branches:
-      - 'master'
-    tags-ignore:
-      - '**'
-    paths-ignore:
-      - 'docs/**'
-      - README.md
+  workflow_dispatch:
 
 jobs:
   renderer:

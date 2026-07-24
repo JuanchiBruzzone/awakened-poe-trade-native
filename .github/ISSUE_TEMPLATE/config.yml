@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Upstream Awakened PoE Trade
+    url: https://github.com/SnosMe/awakened-poe-trade/issues
+    about: Report shared renderer, parser, trade-logic, data, or translation issues upstream.

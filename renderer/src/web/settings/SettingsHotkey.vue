@@ -11,6 +11,9 @@
       <button
         :class="{ [$style.active]: schema.config.modKey.value === 'Alt' }"
         @click="schema.config.modKey.value = 'Alt'">Alt</button>
+      <button
+        :class="{ [$style.active]: schema.config.modKey.value === 'Shift' }"
+        @click="schema.config.modKey.value = 'Shift'">Shift</button>
       <span>+</span>
       <HotkeyInput v-model="schema.config.nonModKey.value" class="w-20"
         :required="schema.required"

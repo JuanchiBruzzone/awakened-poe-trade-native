@@ -1,0 +1,68 @@
+name: Native CI
+
+permissions:
+  contents: read
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - master
+    paths:
+      - 'native/**'
+      - 'renderer/**'
+      - 'ipc/**'
+      - 'build-native.sh'
+      - 'package-appimage.sh'
+      - '.github/workflows/native-linux.yml'
+      - 'scripts/**'
+  pull_request:
+    paths:
+      - 'native/**'
+      - 'renderer/**'
+      - 'ipc/**'
+      - 'build-native.sh'
+      - 'package-appimage.sh'
+      - 'scripts/**'
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    container: archlinux:base-devel
+    steps:
+      - name: Update package database
+        run: pacman -Syu --noconfirm
+
+      - name: Install dependencies
+        run: >-
+          pacman -S --noconfirm --needed
+          git cmake ninja extra-cmake-modules
+          qt6-base qt6-webengine layer-shell-qt
+          kglobalaccel kpackage kconfig
+          opencv tesseract tesseract-data-eng tesseract-data-rus
+          nodejs npm yarn curl file patchelf appstream
+
+      - uses: actions/checkout@v4
+
+      - name: Verify native compatibility contract
+        run: python scripts/check-upstream-contract.py --require-complete
+
+      - name: Validate scripts and metadata
+        run: |
+          bash -n build-native.sh package-appimage.sh install-native-user.sh
+          bash -n install-kwin-integration.sh install-ocr-data.sh sync-upstream.sh
+          appstreamcli validate --no-net native/resources/awakened-poe-trade-native.appdata.xml
+
+      - name: Build renderer and native host
+        run: ./build-native.sh
+
+      - name: Lint renderer
+        working-directory: renderer
+        run: npm run lint
+
+      - name: Upload native binary
+        uses: actions/upload-artifact@v4
+        with:
+          name: awakened-poe-trade-native-binary
+          path: native/build/awakened-poe-trade-native
+          if-no-files-found: error

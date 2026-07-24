@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Application
+Name=Awakened PoE Trade Native
+Comment=Native Linux Path of Exile trade overlay
+Exec=awakened-poe-trade-native
+Icon=awakened-poe-trade-native
+Terminal=false
+Categories=Game;
+StartupNotify=false
+X-KDE-Wayland-VirtualKeyboard=false
+X-KDE-DBUS-Restricted-Interfaces=org.kde.KWin.ScreenShot2

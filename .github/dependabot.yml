@@ -1,0 +1,23 @@
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 5
+  - package-ecosystem: npm
+    directory: /renderer
+    schedule:
+      interval: monthly
+    open-pull-requests-limit: 3
+    groups:
+      renderer-development:
+        dependency-type: development
+  - package-ecosystem: npm
+    directory: /main
+    schedule:
+      interval: monthly
+    open-pull-requests-limit: 3
+    groups:
+      upstream-electron-development:
+        dependency-type: development

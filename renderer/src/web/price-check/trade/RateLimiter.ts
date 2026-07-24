@@ -1,7 +1,3 @@
-/* eslint-disable @typescript-eslint/no-floating-promises,
-                  @typescript-eslint/promise-function-async,
-                  @typescript-eslint/return-await */
-
 import { shallowReactive, shallowRef } from 'vue'
 
 export class RateLimiter {

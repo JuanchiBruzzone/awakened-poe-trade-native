@@ -76,6 +76,8 @@ export type IpcEvent =
   IpcWidgetAction |
   IpcItemText |
   IpcOcrText |
+  IpcBeginHotkeyCapture |
+  IpcHotkeyCaptured |
   IpcConfigChanged |
   IpcUserAction
 
@@ -129,6 +131,17 @@ type IpcSaveConfig =
 type IpcConfigChanged =
   Event<'MAIN->CLIENT::config-changed', {
     contents: string
+  }>
+
+type IpcBeginHotkeyCapture =
+  Event<'CLIENT->MAIN::begin-hotkey-capture', {
+    token: string
+  }>
+
+type IpcHotkeyCaptured =
+  Event<'MAIN->CLIENT::hotkey-captured', {
+    token: string
+    key: string | null
   }>
 
 type IpcLogEntry =

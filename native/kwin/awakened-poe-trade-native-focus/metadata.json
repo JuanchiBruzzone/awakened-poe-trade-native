@@ -1,0 +1,18 @@
+{
+  "KPlugin": {
+    "Name": "Awakened PoE Trade Native Focus Bridge",
+    "Description": "Reports Path of Exile focus and cursor position to the native Awakened PoE Trade host.",
+    "Icon": "applications-games",
+    "Authors": [
+      {
+        "Name": "Awakened PoE Trade Native contributors"
+      }
+    ],
+    "Id": "awakened-poe-trade-native-focus",
+    "Version": "1.0.0",
+    "License": "MIT"
+  },
+  "X-Plasma-API": "javascript",
+  "X-Plasma-MainScript": "code/main.js",
+  "KPackageStructure": "KWin/Script"
+}

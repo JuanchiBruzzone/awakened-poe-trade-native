@@ -1,0 +1,60 @@
+name: Native Linux bug
+description: Report a reproducible problem in the native Linux host
+title: "[Bug]: "
+labels:
+  - bug
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Remove personal data, account names, cookies, whispers, item contents, and private paths from logs.
+  - type: input
+    id: version
+    attributes:
+      label: Native version
+      placeholder: 3.28.104-native.1
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: Environment
+      description: Distribution, Plasma, Qt, GPU, and Wayland/XWayland mode
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Reproduction steps
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Sanitized logs
+      render: text
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Checks
+      options:
+        - label: I followed the self-service troubleshooting guide.
+          required: true
+        - label: I searched existing native and upstream issues.
+          required: true
+        - label: I removed personal or sensitive data.
+          required: true
+        - label: I reproduced this with the latest native release.
+          required: true
