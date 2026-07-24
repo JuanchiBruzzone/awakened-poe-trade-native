@@ -1,8 +1,28 @@
-# Awakened PoE Trade Native
+<p align="center">
+  <img src="main/build/icons/128x128.png" width="96" height="96" alt="Awakened PoE Trade Native">
+</p>
+
+<h1 align="center">Awakened PoE Trade Native</h1>
+
+<p align="center">
+  Native KDE Plasma Wayland host for Awakened PoE Trade
+</p>
+
+<p align="center">
+  <a href="https://github.com/SnosMe/awakened-poe-trade"><img alt="Upstream: SnosMe/awakened-poe-trade" src="https://img.shields.io/badge/upstream-SnosMe%2Fawakened--poe--trade-6f42c1?logo=github"></a>
+  <a href="https://github.com/JuanchiBruzzone/awakened-poe-trade-native/actions/workflows/native-linux.yml"><img alt="Native CI" src="https://github.com/JuanchiBruzzone/awakened-poe-trade-native/actions/workflows/native-linux.yml/badge.svg"></a>
+  <a href="https://github.com/JuanchiBruzzone/awakened-poe-trade-native/releases/latest"><img alt="Latest release" src="https://img.shields.io/github/v/release/JuanchiBruzzone/awakened-poe-trade-native?display_name=tag"></a>
+  <a href="LICENSE"><img alt="MIT license" src="https://img.shields.io/github/license/JuanchiBruzzone/awakened-poe-trade-native"></a>
+  <img alt="Wayland only" src="https://img.shields.io/badge/platform-Plasma%20Wayland-1d99f3?logo=kde">
+</p>
 
 A native Linux host for [Awakened PoE Trade](https://github.com/SnosMe/awakened-poe-trade), focused on KDE Plasma and Wayland.
 
-The upstream Vue interface, item parser, trade logic, data, and translations are preserved. The Electron backend is complemented by a C++20 host built with Qt 6, KDE Frameworks, and LayerShellQt.
+This port exists because of upstream Awakened PoE Trade. Its Vue interface,
+item parser, trade logic, data, translations, UX decisions, and years of
+maintenance are preserved. This repository adds a C++20 host built with Qt 6,
+KDE Frameworks, and LayerShellQt; it does not replace or diminish the
+application created by upstream.
 
 > This is an unofficial community port. It is not affiliated with or endorsed by Grinding Gear Games.
 
@@ -18,6 +38,24 @@ The upstream Vue interface, item parser, trade logic, data, and translations are
 > tested where practical, but users and contributors must verify behavior in
 > their own environment. Help make the project better by including clear
 > reproduction steps, logs, platform details, and focused patches.**
+
+## Built on—and dependent on—upstream
+
+> **SnosMe and the Awakened PoE Trade contributors are the foundation of this
+> project. Without their application, research, maintenance, translations,
+> issue triage, and community work, this native port would not exist.**
+
+The native backend is deliberately kept compatible with the upstream
+application instead of becoming an independent rewrite of its behavior. New
+upstream features and fixes are reviewed and integrated so Linux users can
+continue benefiting from that work. Contributions to parsing, trade queries,
+data, translations, and shared interface behavior belong upstream whenever
+possible; this fork concentrates on the native Plasma Wayland integration.
+
+Please visit, star, contribute to, and thank
+[SnosMe/awakened-poe-trade](https://github.com/SnosMe/awakened-poe-trade).
+Attribution is not a formality here: this port is an extension of a substantial
+upstream project and remains dependent on its continued contributions.
 
 ## Highlights
 
@@ -169,17 +207,33 @@ reporting. Published changes are recorded in [CHANGELOG.md](CHANGELOG.md).
 
 ## Thanks and attribution
 
-This project exists because of the exceptional work of:
+First and foremost, profound thanks to
+[SnosMe](https://github.com/SnosMe) for creating and maintaining Awakened PoE
+Trade, and to every upstream developer, reviewer, translator, designer, data
+maintainer, tester, issue reporter, and community member. Their accumulated
+work is the application users recognize; this repository supplies a native
+Linux host around it.
 
-- [SnosMe](https://github.com/SnosMe) and every contributor to [Awakened PoE Trade](https://github.com/SnosMe/awakened-poe-trade)
-- [Exiled Exchange 2](https://github.com/Kvan7/Exiled-Exchange-2) and its contributors, whose native Linux experiments helped inform this port
-- [libuiohook](https://github.com/kwhat/libuiohook)
-- [RePoE](https://github.com/brather1ng/RePoE)
-- [poeprices.info](https://www.poeprices.info/)
-- [poe.ninja](https://poe.ninja/)
-- The Qt, KDE Plasma, LayerShellQt, `ydotool`, OpenCV, and Tesseract communities
+Every upstream release, parser improvement, trade-site adaptation, translation,
+data correction, and user-experience refinement can become part of this port.
+We are grateful for that continuing foundation and will preserve authorship and
+license attribution while integrating it.
 
-Thank you to all upstream maintainers, translators, issue reporters, testers, and contributors. The native host is designed to preserve and extend their work, not replace its authorship.
+Additional sincere thanks go to:
+
+- [Exiled Exchange 2](https://github.com/Kvan7/Exiled-Exchange-2) and its
+  contributors, whose Linux work provided valuable reference and experience.
+- [libuiohook](https://github.com/kwhat/libuiohook), [RePoE](https://github.com/brather1ng/RePoE),
+  [poeprices.info](https://www.poeprices.info/), and
+  [poe.ninja](https://poe.ninja/) for important parts of the wider ecosystem
+  on which upstream functionality has relied.
+- The Qt, KDE Plasma, LayerShellQt, `ydotool`, `wl-clipboard`, OpenCV,
+  Tesseract, AppImage, and Linux distribution communities whose work makes the
+  native host and its distribution possible.
+
+Thank you to everyone who shares code, documentation, infrastructure, testing,
+and time. The native host is intended to carry that work onto Plasma Wayland
+with respect, visible credit, and as little behavioral divergence as possible.
 
 ## License
 
