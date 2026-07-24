@@ -114,3 +114,8 @@ Package-managed and ordinary local builds still receive update notifications,
 but the unchanged renderer offers a manual download instead of overwriting
 files owned by the package manager. `--no-updates` preserves upstream's
 download-disabled behavior.
+
+Release packaging verifies pinned SHA-256 values for linuxdeploy, its Qt
+plugin, and the AppImage runtime before executing them. Every release includes
+an SPDX 2.3 inventory of the packaged AppDir and GitHub attestations binding
+the AppImage digest to its workflow provenance and SBOM.

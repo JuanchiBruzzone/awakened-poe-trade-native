@@ -14,16 +14,13 @@ on:
       - 'ipc/**'
       - 'build-native.sh'
       - 'package-appimage.sh'
-      - '.github/workflows/native-linux.yml'
+      - '.github/workflows/**'
       - 'scripts/**'
   pull_request:
-    paths:
-      - 'native/**'
-      - 'renderer/**'
-      - 'ipc/**'
-      - 'build-native.sh'
-      - 'package-appimage.sh'
-      - 'scripts/**'
+
+concurrency:
+  group: native-ci-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
 
 jobs:
   verify:
@@ -42,7 +39,7 @@ jobs:
           opencv tesseract tesseract-data-eng tesseract-data-rus
           nodejs npm yarn curl file patchelf appstream
 
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
 
       - name: Verify native compatibility contract
         run: python scripts/check-upstream-contract.py --require-complete
@@ -51,6 +48,7 @@ jobs:
         run: |
           bash -n build-native.sh package-appimage.sh install-native-user.sh
           bash -n install-kwin-integration.sh install-ocr-data.sh sync-upstream.sh
+          python -m py_compile scripts/check-upstream-contract.py scripts/generate-spdx-sbom.py
           appstreamcli validate --no-net native/resources/awakened-poe-trade-native.appdata.xml
 
       - name: Build renderer and native host
@@ -64,7 +62,7 @@ jobs:
         run: npm run lint
 
       - name: Upload native binary
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
         with:
           name: awakened-poe-trade-native-binary
           path: native/build/awakened-poe-trade-native

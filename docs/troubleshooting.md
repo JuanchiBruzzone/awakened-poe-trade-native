@@ -112,7 +112,10 @@ keyboard interactivity from layer-shell, restore the official build.
 ## Quick Price Check closes instantly
 
 The KWin bridge supplies cursor movement while PoE owns the Wayland pointer.
-Reinstall it:
+The AppImage reloads its bundled copy at startup. Exit the application fully
+from the tray and launch the AppImage again.
+
+For a source build only, reinstall it with:
 
 ```bash
 ./install-kwin-integration.sh
@@ -235,6 +238,13 @@ Verify the published checksum:
 
 ```bash
 sha256sum -c Awakened-PoE-Trade-Native-*.AppImage.sha256
+```
+
+When GitHub CLI is installed, also verify the repository-bound provenance:
+
+```bash
+gh attestation verify Awakened-PoE-Trade-Native-*.AppImage \
+  --repo JuanchiBruzzone/awakened-poe-trade-native
 ```
 
 Ensure the file is executable:

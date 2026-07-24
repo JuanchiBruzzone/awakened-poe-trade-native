@@ -19,5 +19,21 @@
   <url type="homepage">https://github.com/JuanchiBruzzone/awakened-poe-trade-native</url>
   <url type="bugtracker">https://github.com/JuanchiBruzzone/awakened-poe-trade-native/issues</url>
   <url type="vcs-browser">https://github.com/JuanchiBruzzone/awakened-poe-trade-native</url>
+  <releases>
+    <release version="3.28.104-native.2" date="2026-07-24">
+      <description>
+        <p>
+          Hardens native releases with pinned inputs, provenance and SBOM
+          attestations, expands Wayland backend tests, and adds native
+          documentation plus automatic upstream monitoring.
+        </p>
+      </description>
+    </release>
+    <release version="3.28.104-native.1" date="2026-07-24">
+      <description>
+        <p>Initial native Plasma Wayland release.</p>
+      </description>
+    </release>
+  </releases>
   <content_rating type="oars-1.1"/>
 </component>

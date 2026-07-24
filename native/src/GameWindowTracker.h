@@ -26,6 +26,15 @@ public:
     QPoint cursorPosition() const;
     bool hasCursorPosition() const;
 
+    static bool matchesGameWindow(const QString &caption,
+                                  const QString &resourceClass,
+                                  const QString &expectedTitle);
+    static bool isSupportedGameWindow(const QString &caption,
+                                      const QString &resourceClass,
+                                      const QString &expectedTitle,
+                                      bool waylandClient);
+    static QString gameNameForClass(const QString &resourceClass);
+
 public slots:
     void ReportActiveWindow(const QString &caption,
                             const QString &resourceClass,

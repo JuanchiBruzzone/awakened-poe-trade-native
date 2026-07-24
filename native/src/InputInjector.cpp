@@ -25,7 +25,7 @@ bool InputInjector::isAvailable() const
     return !m_ydotool.isEmpty();
 }
 
-QStringList InputInjector::tokens(const QString &shortcut)
+QStringList InputInjector::shortcutTokens(const QString &shortcut)
 {
     QString normalized = shortcut;
     normalized.replace(QStringLiteral("ArrowLeft"), QStringLiteral("Left"));
@@ -83,8 +83,8 @@ void InputInjector::sendChord(const QString &requiredChord,
         return;
     }
 
-    const QStringList required = tokens(requiredChord);
-    const QStringList heldList = tokens(triggeringShortcut);
+    const QStringList required = shortcutTokens(requiredChord);
+    const QStringList heldList = shortcutTokens(triggeringShortcut);
     const QSet<QString> held(heldList.cbegin(), heldList.cend());
     const QSet<QString> modifiers{QStringLiteral("Ctrl"), QStringLiteral("Shift"), QStringLiteral("Alt")};
 
@@ -136,7 +136,7 @@ void InputInjector::sendSequence(const QStringList &chords,
     for (const QString &chord : chords) {
         QList<int> chordModifiers;
         QList<int> normalKeys;
-        for (const QString &key : tokens(chord)) {
+        for (const QString &key : shortcutTokens(chord)) {
             const int code = linuxKeyCode(key);
             if (code < 0) {
                 m_logger->write(QStringLiteral("error [InputInjector] Unsupported key: %1")
@@ -174,7 +174,7 @@ void InputInjector::releaseShortcut(const QString &shortcut,
         QStringLiteral("Ctrl"), QStringLiteral("Shift"), QStringLiteral("Alt")
     };
     QStringList args{QStringLiteral("key")};
-    const QStringList keys = tokens(shortcut);
+    const QStringList keys = shortcutTokens(shortcut);
     for (auto it = keys.crbegin(); it != keys.crend(); ++it) {
         if (keepModifiers && modifiers.contains(*it)) continue;
         const int code = linuxKeyCode(*it);

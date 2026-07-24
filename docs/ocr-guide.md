@@ -2,28 +2,34 @@
 title: OCR Guide
 ---
 
-This guide will help you to setup and perform OCR using Awakened PoE Trade.
+# OCR guide
+
+This guide explains how to set up and use native Heist OCR.
 
 ### OCR Setup ###
 
-1. Download a 6MB archive with OCR files from [here](https://github.com/SnosMe/awakened-poe-trade/releases/download/v3.20.10007/cv-ocr.zip).
+The native host uses OpenCV and Tesseract with the proven upstream OCR assets.
+The repository installer downloads the pinned upstream archive, verifies its
+SHA-256 checksum, and installs only the required templates and language data:
 
-2. Open the folder with configuration file.
-   ![](https://i.imgur.com/z5WI9Fx.png)
+```bash
+git clone --depth 1 https://github.com/JuanchiBruzzone/awakened-poe-trade-native.git
+cd awakened-poe-trade-native
+./install-ocr-data.sh
+```
 
-3. Extract "cv-ocr" folder, inside the archive, into it.\
-   You should have the following structure:
+The resulting configuration structure is:
 
-   ```
-   apt-data/
-   ├── config.json
-   └── cv-ocr/
-      ├── eng.traineddata
-      ├── ... more files ...
-      └── tesseract-core-simd.wasm
-   ```
+```text
+apt-data/
+├── config.json
+└── cv-ocr/
+   ├── eng.traineddata
+   ├── rus.traineddata
+   └── ... lock templates
+```
 
-4. Restart the application.
+Restart the application after installation.
 
 ### Widget configuration ###
 

@@ -1,7 +1,11 @@
+#include "ClipboardService.h"
 #include "GameConfigReader.h"
 #include "GameLogWatcher.h"
+#include "GameWindowTracker.h"
+#include "InputInjector.h"
 #include "Logger.h"
 #include "Types.h"
+#include "UpdateService.h"
 
 #include <QFile>
 #include <QJsonArray>
@@ -23,6 +27,13 @@ private slots:
     void gameConfigReadsAdvancedDescriptionBinding();
     void gameConfigFallsBackForMissingBinding();
     void gameLogWatcherEmitsOnlyAppendedLines();
+    void recognizesLocalizedPoeItems();
+    void rejectsNonItemClipboardText();
+    void enforcesNativeWaylandGameWindow();
+    void identifiesPoeApplicationClasses();
+    void normalizesNativeReleaseVersions();
+    void normalizesInputShortcuts();
+    void mapsInputKeysToLinuxCodes();
 };
 
 void NativeCoreTests::hostConfigUsesSafeDefaults()
@@ -173,6 +184,90 @@ void NativeCoreTests::gameLogWatcherEmitsOnlyAppendedLines()
     QCOMPARE(emitted,
              QStringList({QStringLiteral("new first line"),
                           QStringLiteral("new second line")}));
+}
+
+void NativeCoreTests::recognizesLocalizedPoeItems()
+{
+    const QStringList itemHeaders{
+        QStringLiteral("Item Class: Maps"),
+        QStringLiteral("Класс предмета: Карты"),
+        QStringLiteral("Classe d'objet: Cartes"),
+        QStringLiteral("Gegenstandsklasse: Karten"),
+        QStringLiteral("Clase de objeto: Mapas"),
+        QStringLiteral("아이템 종류: 지도"),
+        QStringLiteral("物品类别: 地图"),
+    };
+    for (const QString &header : itemHeaders) {
+        QVERIFY2(ClipboardService::isPoeItem(header),
+                 qPrintable(QStringLiteral("Not recognized: %1").arg(header)));
+    }
+}
+
+void NativeCoreTests::rejectsNonItemClipboardText()
+{
+    QVERIFY(!ClipboardService::isPoeItem(QString{}));
+    QVERIFY(!ClipboardService::isPoeItem(
+        QStringLiteral("whispered trade message")));
+    QVERIFY(!ClipboardService::isPoeItem(
+        QStringLiteral("__APT_FORCE_EMPTY_123")));
+}
+
+void NativeCoreTests::enforcesNativeWaylandGameWindow()
+{
+    const QString title = QStringLiteral("Path of Exile");
+    const QString gameClass = QStringLiteral("steam_app_238960");
+
+    QVERIFY(GameWindowTracker::matchesGameWindow({}, gameClass, title));
+    QVERIFY(GameWindowTracker::isSupportedGameWindow(
+        {}, gameClass, title, true));
+    QVERIFY(!GameWindowTracker::isSupportedGameWindow(
+        {}, gameClass, title, false));
+    QVERIFY(!GameWindowTracker::isSupportedGameWindow(
+        QStringLiteral("Firefox"), QStringLiteral("firefox"), title, true));
+    QVERIFY(!GameWindowTracker::matchesGameWindow(
+        QStringLiteral("Firefox"), QStringLiteral("firefox"), QString{}));
+}
+
+void NativeCoreTests::identifiesPoeApplicationClasses()
+{
+    QCOMPARE(GameWindowTracker::gameNameForClass(
+                 QStringLiteral("steam_app_238960")),
+             QStringLiteral("Path of Exile 1"));
+    QCOMPARE(GameWindowTracker::gameNameForClass(
+                 QStringLiteral("STEAM_APP_2694490")),
+             QStringLiteral("Path of Exile 2"));
+    QCOMPARE(GameWindowTracker::gameNameForClass(
+                 QStringLiteral("pathofexile_x64steam.exe")),
+             QStringLiteral("Path of Exile"));
+}
+
+void NativeCoreTests::normalizesNativeReleaseVersions()
+{
+    QCOMPARE(UpdateService::normalizedVersion(
+                 QStringLiteral("v3.28.104-native.2")),
+             QStringLiteral("3.28.104.2"));
+    QCOMPARE(UpdateService::normalizedVersion(
+                 QStringLiteral("release-3.28.104-native.12-beta")),
+             QStringLiteral("3.28.104.12"));
+    QCOMPARE(UpdateService::normalizedVersion(QStringLiteral("  4.0.0  ")),
+             QStringLiteral("4.0.0"));
+}
+
+void NativeCoreTests::normalizesInputShortcuts()
+{
+    QCOMPARE(InputInjector::shortcutTokens(
+                 QStringLiteral(" Ctrl + ArrowRight ")),
+             QStringList({QStringLiteral("Ctrl"), QStringLiteral("Right")}));
+    QCOMPARE(InputInjector::shortcutTokens(QStringLiteral("Shift+Space")),
+             QStringList({QStringLiteral("Shift"), QStringLiteral("Space")}));
+}
+
+void NativeCoreTests::mapsInputKeysToLinuxCodes()
+{
+    QCOMPARE(InputInjector::linuxKeyCode(QStringLiteral("Ctrl")), 29);
+    QCOMPARE(InputInjector::linuxKeyCode(QStringLiteral("D")), 32);
+    QCOMPARE(InputInjector::linuxKeyCode(QStringLiteral("F5")), 63);
+    QCOMPARE(InputInjector::linuxKeyCode(QStringLiteral("Unknown")), -1);
 }
 
 QTEST_GUILESS_MAIN(NativeCoreTests)

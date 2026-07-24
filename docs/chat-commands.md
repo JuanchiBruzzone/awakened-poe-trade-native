@@ -2,6 +2,8 @@
 title: Chat commands
 ---
 
+# Chat commands
+
 Allows you to send arbitrary text to the chat.
 
 #### List of available commands ####

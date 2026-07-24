@@ -11,6 +11,46 @@
 }
 
 .markdown-body {
+  color: #2c3740;
+  line-height: 1.68;
+
+  > h1:first-child {
+    margin-top: 1.4rem;
+    color: #15364f;
+    font-size: clamp(1.7rem, 4vw, 2.35rem);
+    letter-spacing: -0.035em;
+  }
+
+  h2 {
+    padding-bottom: .45rem;
+    border-bottom: 1px solid #e3ebf0;
+    color: #173e5b;
+    font-size: 1.35rem;
+  }
+
+  blockquote {
+    padding: 1rem 1.15rem;
+    border-left: 4px solid #1d99f3;
+    border-radius: 0 12px 12px 0;
+    color: #244e6b;
+    background: #eef8ff;
+
+    p:last-child { margin-bottom: 0; }
+  }
+
+  table {
+    border-radius: 10px;
+
+    th { color: #173e5b; background: #edf6fc; }
+  }
+
+  pre {
+    border: 1px solid #d5e2eb;
+    background: #f5f8fa;
+  }
+}
+
+.markdown-body {
   table {
     display: block;
     width: 100%;

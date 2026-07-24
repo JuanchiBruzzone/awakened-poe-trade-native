@@ -21,7 +21,7 @@ startup logs.
 | KDE GlobalAccel | Registers configurable system-wide shortcuts | Host integration required |
 | `ydotool` and `ydotoold` | Sends copy, chat, and command keystrokes to PoE | Yes |
 | `wl-clipboard` | Reliable Wayland clipboard fallback through `wl-paste` | Yes |
-| KWin bridge script | Game-focus gating and compositor-native cursor tracking | Strongly recommended |
+| KWin bridge script | Game-focus gating and compositor-native cursor tracking | Bundled and loaded by AppImage |
 | OpenCV and Tesseract data | Heist OCR | Optional |
 | `/dev/input/event*` access | Ctrl+wheel stash navigation only | Optional |
 
@@ -79,7 +79,10 @@ ydotool --help
 
 ## KWin integration
 
-From a source checkout:
+The AppImage bundles the bridge and loads it for the current KWin session at
+startup. No separate installation is needed.
+
+From a source checkout, install it once with:
 
 ```bash
 ./install-kwin-integration.sh

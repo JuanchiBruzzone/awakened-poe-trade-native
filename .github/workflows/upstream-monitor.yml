@@ -1,0 +1,105 @@
+name: Upstream monitor
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '17 8 * * 1'
+
+permissions:
+  contents: read
+  issues: write
+
+concurrency:
+  group: upstream-monitor
+  cancel-in-progress: true
+
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out native fork
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          fetch-depth: 0
+
+      - name: Compare with canonical upstream
+        id: upstream
+        shell: bash
+        run: |
+          git remote add canonical https://github.com/SnosMe/awakened-poe-trade.git
+          git fetch --no-tags canonical master
+          count="$(git rev-list --count HEAD..canonical/master)"
+          echo "count=$count" >> "$GITHUB_OUTPUT"
+          base="$(git merge-base HEAD canonical/master)"
+          {
+            echo "# Upstream integration report"
+            echo
+            echo "Canonical source: \`SnosMe/awakened-poe-trade@master\`"
+            echo
+            echo "Commits awaiting review: **$count**"
+            echo
+            echo "## Commits"
+            echo
+            if [[ "$count" == "0" ]]; then
+              echo "The native branch contains all current upstream commits."
+            else
+              git log --no-decorate --pretty='- `%h` %s' HEAD..canonical/master
+              echo
+              echo "## Files changed upstream"
+              echo
+              echo '```text'
+              git diff --name-status "$base"..canonical/master -- main/src ipc renderer \
+                || true
+              echo '```'
+              echo
+              echo "Review \`docs/upstream-sync.md\` before integrating."
+            fi
+          } > upstream-report.md
+
+      - name: Open or update integration issue
+        if: steps.upstream.outputs.count != '0'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          gh label create upstream-sync \
+            --repo "$GITHUB_REPOSITORY" \
+            --color 6f42c1 \
+            --description "Canonical upstream changes awaiting native review" \
+            --force
+          issue="$(gh issue list \
+            --repo "$GITHUB_REPOSITORY" \
+            --state open \
+            --label upstream-sync \
+            --json number \
+            --jq '.[0].number // empty')"
+          if [[ -n "$issue" ]]; then
+            gh issue comment "$issue" \
+              --repo "$GITHUB_REPOSITORY" \
+              --body-file upstream-report.md
+          else
+            gh issue create \
+              --repo "$GITHUB_REPOSITORY" \
+              --title "Review new Awakened PoE Trade upstream changes" \
+              --label upstream-sync \
+              --body-file upstream-report.md
+          fi
+
+      - name: Close completed integration issue
+        if: steps.upstream.outputs.count == '0'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          issue="$(gh issue list \
+            --repo "$GITHUB_REPOSITORY" \
+            --state open \
+            --label upstream-sync \
+            --json number \
+            --jq '.[0].number // empty')"
+          if [[ -n "$issue" ]]; then
+            gh issue comment "$issue" \
+              --repo "$GITHUB_REPOSITORY" \
+              --body "All currently published upstream commits are integrated. Closing automatically."
+            gh issue close "$issue" --repo "$GITHUB_REPOSITORY"
+          fi

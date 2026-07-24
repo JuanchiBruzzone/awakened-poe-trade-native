@@ -38,6 +38,7 @@ npm run lint
 npm run build
 cd ..
 ./build-native.sh
+ctest --test-dir native/build --output-on-failure
 appstreamcli validate --no-net native/resources/awakened-poe-trade-native.appdata.xml
 ```
 
@@ -70,3 +71,5 @@ Example: `3.28.104-native.2`.
 Only bump it after the release commit is ready. Merging that change to
 `master` runs the release workflow, creates `v<VERSION>`, verifies the
 AppImage, and publishes the AppImage and checksum. Existing tags are immutable.
+The release also publishes an SPDX SBOM and repository-bound GitHub
+attestations.

@@ -1,7 +1,8 @@
 {
   "type": "module",
   "scripts": {
-    "dev": "vitepress dev"
+    "dev": "vitepress dev",
+    "build": "vitepress build"
   },
   "devDependencies": {
     "postcss": "^8.2.14",
@@ -16,7 +17,7 @@
         "config": {
           "content": [
             "./.vitepress/**/*.{js,vue}",
-            "./**/*.md"
+            "./*.md"
           ]
         }
       }

@@ -108,25 +108,57 @@ void GameWindowTracker::ReportCursorPosition(int x, int y)
     emit cursorPositionChanged(x, y);
 }
 
+bool GameWindowTracker::matchesGameWindow(const QString &caption,
+                                          const QString &resourceClass,
+                                          const QString &expectedTitle)
+{
+    const bool titleMatch =
+        !expectedTitle.trimmed().isEmpty() &&
+        caption.contains(expectedTitle, Qt::CaseInsensitive);
+    return titleMatch ||
+           resourceClass.contains(QStringLiteral("pathofexile"),
+                                  Qt::CaseInsensitive) ||
+           resourceClass.contains(QStringLiteral("path of exile"),
+                                  Qt::CaseInsensitive) ||
+           resourceClass.compare(QStringLiteral("steam_app_238960"),
+                                 Qt::CaseInsensitive) == 0 ||
+           resourceClass.compare(QStringLiteral("steam_app_2694490"),
+                                 Qt::CaseInsensitive) == 0;
+}
+
+bool GameWindowTracker::isSupportedGameWindow(
+    const QString &caption,
+    const QString &resourceClass,
+    const QString &expectedTitle,
+    bool waylandClient)
+{
+    return waylandClient &&
+           matchesGameWindow(caption, resourceClass, expectedTitle);
+}
+
+QString GameWindowTracker::gameNameForClass(const QString &resourceClass)
+{
+    if (resourceClass.compare(QStringLiteral("steam_app_238960"),
+                              Qt::CaseInsensitive) == 0) {
+        return QStringLiteral("Path of Exile 1");
+    }
+    if (resourceClass.compare(QStringLiteral("steam_app_2694490"),
+                              Qt::CaseInsensitive) == 0) {
+        return QStringLiteral("Path of Exile 2");
+    }
+    return QStringLiteral("Path of Exile");
+}
+
 void GameWindowTracker::recompute(bool forceSignal)
 {
     if (!m_known) return;
 
-    const bool titleMatch = m_caption.contains(m_expectedTitle, Qt::CaseInsensitive);
-    const bool classMatch = m_resourceClass.contains(QStringLiteral("pathofexile"), Qt::CaseInsensitive) ||
-                            m_resourceClass.contains(QStringLiteral("path of exile"), Qt::CaseInsensitive);
-    const bool gameWindow = titleMatch || classMatch;
+    const bool gameWindow =
+        matchesGameWindow(m_caption, m_resourceClass, m_expectedTitle);
     if (gameWindow) {
         const int protocol = m_waylandClient ? 1 : 0;
         if (m_lastReportedGameProtocol != protocol) {
-            const QString gameName =
-                m_resourceClass.compare(QStringLiteral("steam_app_238960"),
-                                        Qt::CaseInsensitive) == 0
-                ? QStringLiteral("Path of Exile 1")
-                : (m_resourceClass.compare(QStringLiteral("steam_app_2694490"),
-                                           Qt::CaseInsensitive) == 0
-                   ? QStringLiteral("Path of Exile 2")
-                   : QStringLiteral("Path of Exile"));
+            const QString gameName = gameNameForClass(m_resourceClass);
             m_logger->write(m_waylandClient
                 ? QStringLiteral(
                     "info [GameWindow] %1 is running as a native Wayland client.")
@@ -139,7 +171,8 @@ void GameWindowTracker::recompute(bool forceSignal)
             m_lastReportedGameProtocol = protocol;
         }
     }
-    const bool active = gameWindow && m_waylandClient;
+    const bool active = isSupportedGameWindow(
+        m_caption, m_resourceClass, m_expectedTitle, m_waylandClient);
     if (!forceSignal && active == m_gameActive) return;
 
     m_gameActive = active;

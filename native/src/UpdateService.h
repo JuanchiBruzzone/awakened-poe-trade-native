@@ -22,6 +22,7 @@ public:
     QJsonObject state() const;
     void check();
     void installAndRestart();
+    static QString normalizedVersion(const QString &version);
 
 signals:
     void stateChanged(const QJsonObject &state);
@@ -34,8 +35,6 @@ private:
                   const QByteArray &expectedSha256,
                   const QString &version);
     bool canReplaceAppImage() const;
-    static QString normalizedVersion(const QString &version);
-
     QString m_repository;
     QString m_currentVersion;
     QString m_dataDirectory;

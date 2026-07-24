@@ -105,8 +105,12 @@ if(BUILD_TESTING)
     tests/NativeCoreTests.cpp
     src/Types.h
     src/Logger.h src/Logger.cpp
+    src/ClipboardService.h src/ClipboardService.cpp
     src/GameConfigReader.h src/GameConfigReader.cpp
     src/GameLogWatcher.h src/GameLogWatcher.cpp
+    src/GameWindowTracker.h src/GameWindowTracker.cpp
+    src/InputInjector.h src/InputInjector.cpp
+    src/UpdateService.h src/UpdateService.cpp
   )
   target_include_directories(awakened-poe-trade-native-tests PRIVATE src)
   target_compile_definitions(awakened-poe-trade-native-tests PRIVATE
@@ -117,7 +121,7 @@ if(BUILD_TESTING)
     -Wall -Wextra -Wpedantic -Wconversion -Wshadow
   )
   target_link_libraries(awakened-poe-trade-native-tests PRIVATE
-    Qt6::Core Qt6::Test
+    Qt6::Core Qt6::Gui Qt6::Network Qt6::DBus Qt6::Test
   )
   add_test(NAME native-core COMMAND awakened-poe-trade-native-tests)
   set_tests_properties(native-core PROPERTIES

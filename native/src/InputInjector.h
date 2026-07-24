@@ -29,6 +29,9 @@ public:
     void tapKey(const QString &key, std::function<void(bool)> done = {});
     void typeText(const QString &text, std::function<void(bool)> done = {});
 
+    static QStringList shortcutTokens(const QString &shortcut);
+    static int linuxKeyCode(const QString &key);
+
 private:
     struct Command {
         QString program;
@@ -42,8 +45,6 @@ private:
         bool success = true;
     };
 
-    static QStringList tokens(const QString &shortcut);
-    static int linuxKeyCode(const QString &key);
     void enqueue(QList<Command> commands, std::function<void(bool)> done);
     void startNextJob();
     void runCurrentCommand();

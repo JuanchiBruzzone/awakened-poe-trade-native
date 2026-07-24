@@ -95,9 +95,12 @@ The AppImage includes the application and renderer. The following host component
 
 Read [Linux dependencies and setup](docs/linux-dependencies.md) before
 installing. For logs, recovery steps, and common fixes, use the
-[self-service troubleshooting guide](docs/troubleshooting.md).
+[self-service troubleshooting guide](docs/troubleshooting.md). The same guides
+are available on the
+[native documentation site](https://juanchibruzzone.github.io/awakened-poe-trade-native/).
 
-Install and enable the optional KWin bridge from a source checkout for strict game-focus gating, cursor-based quick-check auto-hide, and overlay integration:
+The AppImage bundles and loads its KWin bridge automatically. Source-build
+users install the same bridge once with:
 
 ```bash
 ./install-kwin-integration.sh
@@ -176,7 +179,16 @@ The original frontend development guide remains in [DEVELOPING.md](DEVELOPING.md
 Native releases are automated. A reviewed change to
 [`native/VERSION`](native/VERSION) on `master` runs the complete verification
 and packaging pipeline, creates the matching Git tag, and publishes the
-AppImage plus its SHA-256 file. Never reuse or move an existing release tag.
+AppImage, SHA-256 file, and SPDX SBOM. GitHub also records signed build
+provenance and SBOM attestations. Never reuse or move an existing release tag.
+
+Verify a downloaded release with:
+
+```bash
+sha256sum -c Awakened-PoE-Trade-Native-*.AppImage.sha256
+gh attestation verify Awakened-PoE-Trade-Native-*.AppImage \
+  --repo JuanchiBruzzone/awakened-poe-trade-native
+```
 
 ## Issues, fixes, and feature requests
 

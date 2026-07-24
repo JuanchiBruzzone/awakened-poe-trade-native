@@ -1,15 +1,15 @@
 import { defineConfig } from 'vitepress'
 
-const BASE = '/awakened-poe-trade/'
+const BASE = '/awakened-poe-trade-native/'
 
 export default defineConfig({
-  title: 'Awakened PoE Trade',
-  description: 'App for price-checking items in Path of Exile',
+  title: 'Awakened PoE Trade Native',
+  description: 'Native KDE Plasma Wayland host for Awakened PoE Trade',
   base: BASE,
   mpa: true,
   head: [
     ['link', { rel: 'shortcut icon', type: 'image/png', href: `${BASE}favicon.png` }],
-    ['meta', { name: 'google-site-verification', content: 'R0xdvBEYFTxfn0RxHhquiA6tBgvshYv3ODk-oNSuq4g' }]
+    ['meta', { name: 'theme-color', content: '#1d99f3' }]
   ],
   markdown: {
     theme: 'light-plus',
@@ -19,54 +19,60 @@ export default defineConfig({
     }
   },
   themeConfig: {
-    // logo: 'TODO', https://github.com/vuejs/vitepress/issues/1401
-    appVersion: '3.28.101',
+    appVersion: '3.28.104-native.2',
     github: {
-      releasesUrl: 'https://github.com/SnosMe/awakened-poe-trade/releases'
+      releasesUrl: 'https://github.com/JuanchiBruzzone/awakened-poe-trade-native/releases'
     },
     socialLinks: [
       {
-        text: 'Discord',
-        color: '#7289DA',
-        link: 'https://github.com/SnosMe/awakened-poe-trade/issues/22'
+        text: 'Native GitHub',
+        color: '#1d99f3',
+        link: 'https://github.com/JuanchiBruzzone/awakened-poe-trade-native'
       },
       {
-        text: 'Patreon',
-        color: '#FF424D',
-        link: 'https://patreon.com/awakened_poe_trade'
-      },
-      {
-        text: 'GitHub',
-        color: '#181717',
+        text: 'Upstream',
+        color: '#6f42c1',
         link: 'https://github.com/SnosMe/awakened-poe-trade'
       }
     ],
     sidebar: [
       {
+        text: 'Get started',
         items: [{
           text: 'Download',
           link: '/download'
         }, {
-          text: 'Quick Start',
+          text: 'Quick start',
           link: '/quick-start'
+        }, {
+          text: 'Linux setup',
+          link: '/linux-dependencies'
         }]
       },
       {
+        text: 'Use and repair',
         items: [{
+          text: 'Troubleshooting',
+          link: '/troubleshooting'
+        }, {
+          text: 'OCR guide',
+          link: '/ocr-guide'
+        }, {
           text: 'Chat commands',
           link: '/chat-commands'
-        }, {
-          text: 'OCR Guide',
-          link: '/ocr-guide'
         }]
       },
       {
+        text: 'Project',
         items: [{
-          text: 'Common issues',
-          link: '/issues'
+          text: 'Native architecture',
+          link: '/native-architecture'
         }, {
-          text: 'FAQ',
-          link: '/faq'
+          text: 'Upstream sync',
+          link: '/upstream-sync'
+        }, {
+          text: 'Contributing',
+          link: 'https://github.com/JuanchiBruzzone/awakened-poe-trade-native/blob/master/CONTRIBUTING.md'
         }]
       }
     ]
