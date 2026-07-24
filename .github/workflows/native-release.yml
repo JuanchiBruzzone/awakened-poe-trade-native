@@ -98,10 +98,16 @@ jobs:
         env:
           VERSION: ${{ steps.version.outputs.version }}
         run: |
-          artifact="native/build/Awakened-PoE-Trade-Native-$VERSION-x86_64.AppImage"
+          artifact="$GITHUB_WORKSPACE/native/build/Awakened-PoE-Trade-Native-$VERSION-x86_64.AppImage"
           sha256sum -c "$artifact.sha256"
           output="$(APPIMAGE_EXTRACT_AND_RUN=1 "$artifact" --version)"
           [[ "$output" == *"$VERSION"* ]]
+          extract_dir="$(mktemp -d)"
+          (
+            cd "$extract_dir"
+            "$artifact" --appimage-extract >/dev/null
+            test -f squashfs-root/usr/plugins/wayland-graphics-integration-client/libqt-plugin-wayland-egl.so
+          )
 
       - name: Generate SPDX SBOM
         env:

@@ -3,6 +3,16 @@
 All notable native-port changes are documented here. Shared Awakened PoE Trade
 changes remain documented by the upstream project.
 
+## 3.28.104-native.4
+
+### Fixed
+
+- Bundled Qt's Wayland EGL client-buffer integration in the AppImage. The
+  previous AppImage accepted overlay shortcuts but could remain transparent
+  because the release packager silently omitted this plugin.
+- Added release verification that extracts the completed AppImage and fails
+  when the required Wayland EGL plugin is absent or has unresolved libraries.
+
 ## 3.28.104-native.3
 
 ### Added

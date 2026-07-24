@@ -20,6 +20,14 @@
   <url type="bugtracker">https://github.com/JuanchiBruzzone/awakened-poe-trade-native/issues</url>
   <url type="vcs-browser">https://github.com/JuanchiBruzzone/awakened-poe-trade-native</url>
   <releases>
+    <release version="3.28.104-native.4" date="2026-07-24">
+      <description>
+        <p>
+          Fixes transparent overlays in the AppImage by explicitly bundling
+          and validating Qt's Wayland EGL rendering integration.
+        </p>
+      </description>
+    </release>
     <release version="3.28.104-native.3" date="2026-07-24">
       <description>
         <p>
