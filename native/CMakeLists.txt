@@ -9,6 +9,7 @@ set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTORCC ON)
 
 include(GNUInstallDirs)
+include(CTest)
 
 find_package(ECM 6.0 REQUIRED NO_MODULE)
 list(APPEND CMAKE_MODULE_PATH ${ECM_MODULE_PATH})
@@ -23,6 +24,10 @@ find_package(LayerShellQt REQUIRED)
 find_package(OpenCV REQUIRED COMPONENTS core imgproc imgcodecs)
 find_package(PkgConfig REQUIRED)
 pkg_check_modules(Tesseract REQUIRED IMPORTED_TARGET tesseract)
+
+if(BUILD_TESTING)
+  find_package(Qt6 6.6 REQUIRED COMPONENTS Test)
+endif()
 
 set(APT_RENDERER_DEFAULT_PATH "" CACHE PATH "Default path to renderer/dist")
 set(APT_NATIVE_VERSION "${PROJECT_VERSION}" CACHE STRING
@@ -94,6 +99,32 @@ target_include_directories(awakened-poe-trade-native PRIVATE
   ${OpenCV_INCLUDE_DIRS}
 )
 message(STATUS "Native Heist OCR enabled")
+
+if(BUILD_TESTING)
+  add_executable(awakened-poe-trade-native-tests
+    tests/NativeCoreTests.cpp
+    src/Types.h
+    src/Logger.h src/Logger.cpp
+    src/GameConfigReader.h src/GameConfigReader.cpp
+    src/GameLogWatcher.h src/GameLogWatcher.cpp
+  )
+  target_include_directories(awakened-poe-trade-native-tests PRIVATE src)
+  target_compile_definitions(awakened-poe-trade-native-tests PRIVATE
+    QT_NO_CAST_FROM_ASCII
+    QT_NO_CAST_TO_ASCII
+  )
+  target_compile_options(awakened-poe-trade-native-tests PRIVATE
+    -Wall -Wextra -Wpedantic -Wconversion -Wshadow
+  )
+  target_link_libraries(awakened-poe-trade-native-tests PRIVATE
+    Qt6::Core Qt6::Test
+  )
+  add_test(NAME native-core COMMAND awakened-poe-trade-native-tests)
+  set_tests_properties(native-core PROPERTIES
+    TIMEOUT 30
+    ENVIRONMENT "QT_QPA_PLATFORM=offscreen"
+  )
+endif()
 
 install(TARGETS awakened-poe-trade-native
   RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}

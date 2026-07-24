@@ -88,6 +88,7 @@ Then run:
 
 ```bash
 ./build-native.sh
+ctest --test-dir native/build --output-on-failure
 ./native/build/awakened-poe-trade-native
 ```
 

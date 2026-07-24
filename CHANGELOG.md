@@ -25,7 +25,8 @@ Initial native Linux release based on Awakened PoE Trade 3.28.104.
 - Embedded trade browser, game-log monitoring, stash search, Heist OCR, and
   optional Ctrl+wheel stash navigation.
 - AppImage packaging, checksum verification, automated version tags/releases,
-  upstream contract checks, CI, issue templates, and self-service docs.
+  upstream contract checks, native unit/integration tests in CI, issue
+  templates, and self-service docs.
 
 ### Attribution
 
