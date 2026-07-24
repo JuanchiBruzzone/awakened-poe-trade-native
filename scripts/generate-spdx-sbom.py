@@ -22,7 +22,15 @@ def checksum(path: pathlib.Path, algorithm: str) -> str:
 
 def git_value(root: pathlib.Path, *arguments: str) -> str:
     return subprocess.check_output(
-        ["git", "-C", str(root), *arguments], text=True
+        [
+            "git",
+            "-c",
+            f"safe.directory={root}",
+            "-C",
+            str(root),
+            *arguments,
+        ],
+        text=True,
     ).strip()
 
 
