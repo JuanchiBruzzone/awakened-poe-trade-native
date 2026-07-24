@@ -5,7 +5,7 @@
   },
   "watchedTrees": {
     "main/src": "63e1237cbb0fa7a3bc9b52bdf2c7963734ce0894200552ebef7ff37b225d83e3",
-    "ipc": "463585623a79b80639707e80ba541606d685d545ecfcee7910d6dbc1a4264ca2"
+    "ipc": "ad604715433b68869adf68150b020bc1b5a5811065d16d1a4ebb8fd83b5f4900"
   },
   "capabilities": {
     "http-static-config-uploads-proxy": "implemented",
@@ -13,6 +13,7 @@
     "config-and-file-locations": "implemented",
     "system-tray": "implemented",
     "global-shortcuts": "implemented",
+    "native-number-filter-entry": "implemented",
     "clipboard-item-capture": "implemented",
     "game-config-and-log-watchers": "implemented",
     "wayland-layer-shell-overlay": "implemented",

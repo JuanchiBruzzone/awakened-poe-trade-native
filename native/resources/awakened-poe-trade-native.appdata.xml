@@ -20,6 +20,15 @@
   <url type="bugtracker">https://github.com/JuanchiBruzzone/awakened-poe-trade-native/issues</url>
   <url type="vcs-browser">https://github.com/JuanchiBruzzone/awakened-poe-trade-native</url>
   <releases>
+    <release version="3.28.104-native.3" date="2026-07-24">
+      <description>
+        <p>
+          Restores complete modifier parsing and native numeric filter entry,
+          fixes tray shutdown and external-window behavior, and improves
+          system-browser activation on Wayland.
+        </p>
+      </description>
+    </release>
     <release version="3.28.104-native.2" date="2026-07-24">
       <description>
         <p>

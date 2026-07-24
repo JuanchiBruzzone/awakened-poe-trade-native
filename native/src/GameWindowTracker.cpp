@@ -132,8 +132,8 @@ bool GameWindowTracker::isSupportedGameWindow(
     const QString &expectedTitle,
     bool waylandClient)
 {
-    return waylandClient &&
-           matchesGameWindow(caption, resourceClass, expectedTitle);
+    Q_UNUSED(waylandClient);
+    return matchesGameWindow(caption, resourceClass, expectedTitle);
 }
 
 QString GameWindowTracker::gameNameForClass(const QString &resourceClass)
@@ -164,9 +164,8 @@ void GameWindowTracker::recompute(bool forceSignal)
                     "info [GameWindow] %1 is running as a native Wayland client.")
                     .arg(gameName)
                 : QStringLiteral(
-                    "error [GameWindow] %1 is running through XWayland. "
-                    "This build is Wayland-only; relaunch the game with native "
-                    "Wayland enabled.")
+                    "warn [GameWindow] KWin reports %1 through XWayland. "
+                    "The supported setup uses native Wayland.")
                     .arg(gameName));
             m_lastReportedGameProtocol = protocol;
         }

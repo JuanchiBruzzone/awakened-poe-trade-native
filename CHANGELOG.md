@@ -3,6 +3,36 @@
 All notable native-port changes are documented here. Shared Awakened PoE Trade
 changes remain documented by the upstream project.
 
+## 3.28.104-native.3
+
+### Added
+
+- Native number entry for price-check filters without transferring keyboard
+  focus away from Path of Exile.
+- Wayland activation-token support when opening external trade links.
+- Regression coverage for clean shutdown with connected renderer clients and
+  advanced item-copy bindings.
+
+### Changed
+
+- Tray actions now use non-blocking desktop notifications and launch external
+  applications without inheriting the overlay's layer-shell environment.
+- Path of Exile protocol detection remains diagnostic: native Wayland is the
+  supported target, but an inconsistent compositor protocol label no longer
+  blocks the overlay.
+
+### Fixed
+
+- Restored upstream advanced item descriptions during item copy so modifier
+  stats, sources, and ranges are parsed correctly.
+- Held custom advanced-description bindings while pressing `C`, matching
+  upstream behavior.
+- Prevented a shutdown crash when quitting from the tray.
+- Kept Settings and League selection compact, and stopped Dolphin from opening
+  as an unminimizable layer-shell surface.
+- Closed the price-check panel when Trade is opened and forwarded compositor
+  activation to the system browser.
+
 ## 3.28.104-native.2
 
 ### Added
@@ -13,7 +43,7 @@ changes remain documented by the upstream project.
   canonical upstream commits require review.
 - SPDX 2.3 release inventory plus GitHub build-provenance and SBOM
   attestations.
-- Native tests for localized item detection, Wayland-only game gating, PoE
+- Native tests for localized item detection, PoE window recognition, PoE
   application identification, updater versions, shortcut parsing, and Linux
   key mappings.
 
@@ -42,7 +72,7 @@ Initial native Linux release based on Awakened PoE Trade 3.28.104.
 - Native system tray, KGlobalAccel shortcuts, configuration storage, HTTP and
   WebSocket renderer transport, trade proxy, uploads, and updater.
 - KWin focus, client-protocol, geometry, and cursor bridge.
-- Wayland-only desktop and PoE client validation.
+- Wayland desktop validation and PoE client-protocol diagnostics.
 - Startup dependency diagnostics and self-loading bundled KWin bridge.
 - Reliable PoE item capture using clean Ctrl+C timing and `wl-paste` fallback.
 - Quick and locked price-check behavior with compositor-native auto-hide.

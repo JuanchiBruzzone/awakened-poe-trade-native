@@ -20,8 +20,10 @@ ShortcutManager::ShortcutManager(Logger *logger, bool stealConflicts, QObject *p
 {
     m_captureTimer.setSingleShot(true);
     m_captureTimer.setInterval(10000);
-    connect(&m_captureTimer, &QTimer::timeout,
-            this, &ShortcutManager::cancelLetterCapture);
+    connect(&m_captureTimer, &QTimer::timeout, this, [this] {
+        cancelLetterCapture();
+        cancelNumberCapture();
+    });
 }
 
 ShortcutManager::~ShortcutManager()
@@ -81,6 +83,7 @@ bool ShortcutManager::registerAction(QAction *action, const QKeySequence &sequen
 void ShortcutManager::clear()
 {
     cancelLetterCapture();
+    cancelNumberCapture();
     for (QAction *action : std::as_const(m_actions)) {
         KGlobalAccel::self()->removeAllShortcuts(action);
         action->deleteLater();
@@ -91,6 +94,7 @@ void ShortcutManager::clear()
 void ShortcutManager::beginLetterCapture(const QString &token)
 {
     cancelLetterCapture();
+    cancelNumberCapture();
     if (token.isEmpty()) return;
     m_captureToken = token;
 
@@ -124,6 +128,53 @@ void ShortcutManager::beginLetterCapture(const QString &token)
         .arg(m_captureActions.size()));
 }
 
+void ShortcutManager::beginNumberCapture(const QString &token)
+{
+    cancelLetterCapture();
+    cancelNumberCapture();
+    if (token.isEmpty()) return;
+    m_numberCaptureToken = token;
+
+    QStringList keys{
+        QStringLiteral("Backspace"), QStringLiteral("Delete"),
+        QStringLiteral("Enter"), QStringLiteral("Escape"),
+        QStringLiteral("."), QStringLiteral("-")
+    };
+    for (int digit = 0; digit <= 9; ++digit) {
+        keys.append(QString::number(digit));
+    }
+
+    for (const QString &key : keys) {
+        auto *action = new QAction(this);
+        action->setObjectName(
+            QStringLiteral("apt-native-number-capture-%1").arg(key));
+        action->setText(
+            QStringLiteral("Awakened PoE Trade: Capture number %1").arg(key));
+        connect(action, &QAction::triggered, this, [this, key] {
+            const QString capturedToken = m_numberCaptureToken;
+            if (capturedToken.isEmpty()) return;
+            emit numberCaptured(capturedToken, key);
+            if (key == QStringLiteral("Enter") ||
+                key == QStringLiteral("Escape")) {
+                cancelNumberCapture();
+            } else {
+                m_captureTimer.start();
+            }
+        });
+        if (registerAction(action, parseSequence(key))) {
+            action->setEnabled(true);
+            m_numberCaptureActions.append(action);
+        } else {
+            action->deleteLater();
+        }
+    }
+
+    m_captureTimer.start();
+    m_logger->write(
+        QStringLiteral("debug [Shortcuts] Number capture armed with %1 keys.")
+            .arg(m_numberCaptureActions.size()));
+}
+
 void ShortcutManager::cancelLetterCapture()
 {
     m_captureTimer.stop();
@@ -133,6 +184,17 @@ void ShortcutManager::cancelLetterCapture()
         action->deleteLater();
     }
     m_captureActions.clear();
+}
+
+void ShortcutManager::cancelNumberCapture()
+{
+    m_captureTimer.stop();
+    m_numberCaptureToken.clear();
+    for (QAction *action : std::as_const(m_numberCaptureActions)) {
+        KGlobalAccel::self()->removeAllShortcuts(action);
+        action->deleteLater();
+    }
+    m_numberCaptureActions.clear();
 }
 
 void ShortcutManager::setGameActive(bool active, bool known)

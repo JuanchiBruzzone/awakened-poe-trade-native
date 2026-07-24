@@ -57,6 +57,33 @@ EventServer::EventServer(QString rendererRoot,
     });
 }
 
+EventServer::~EventServer()
+{
+    // QTcpServer owns its pending/accepted sockets. Its destructor can destroy
+    // them and emit disconnected() after m_clients has already been destroyed,
+    // because members are torn down in reverse declaration order. Disconnect
+    // those callbacks while all EventServer state is still alive.
+    const QList<QTcpSocket *> sockets = m_clients.keys();
+    for (QTcpSocket *socket : sockets) {
+        if (!socket) continue;
+        QObject::disconnect(socket, nullptr, this, nullptr);
+        socket->abort();
+    }
+    QObject::disconnect(&m_tcp, nullptr, this, nullptr);
+    m_tcp.close();
+    m_lastActive.clear();
+    m_clients.clear();
+
+    // An in-flight renderer proxy request must not call back while the network
+    // manager and the rest of this server are being dismantled.
+    const QList<QNetworkReply *> replies =
+        m_network.findChildren<QNetworkReply *>();
+    for (QNetworkReply *reply : replies) {
+        QObject::disconnect(reply, nullptr, this, nullptr);
+        reply->abort();
+    }
+}
+
 bool EventServer::listen(const QHostAddress &address, quint16 requestedPort)
 {
     if (!m_tcp.listen(address, requestedPort)) {
@@ -96,6 +123,7 @@ void EventServer::acceptConnections()
 
 void EventServer::removeClient(QTcpSocket *socket)
 {
+    if (!socket || !m_clients.contains(socket)) return;
     const bool wasLastActive = m_lastActive == socket;
     m_clients.remove(socket);
     socket->deleteLater();

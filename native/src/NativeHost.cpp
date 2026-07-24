@@ -100,6 +100,13 @@ NativeHost::NativeHost(NativeOptions options, QObject *parent)
                          letter.isEmpty() ? QJsonValue(QJsonValue::Null)
                                           : QJsonValue(letter)}}));
     });
+    connect(&m_shortcuts, &ShortcutManager::numberCaptured,
+            this, [this](const QString &token, const QString &key) {
+        m_server.broadcast(makeEvent(
+            QStringLiteral("MAIN->CLIENT::number-captured"),
+            QJsonObject{{QStringLiteral("token"), token},
+                        {QStringLiteral("key"), key}}));
+    });
     connect(&m_inputMonitor, &InputEventMonitor::wheelRotated,
             this, [this](int rotation) {
         if (!m_hostConfig.stashScroll || !m_gameWindow.isGameActive() ||
@@ -210,8 +217,8 @@ bool NativeHost::start()
         if (!m_gameWindow.isKnown()) {
             m_logger.write(QStringLiteral(
                 "error [Startup] The KWin bridge has not connected. Install "
-                "and enable awakened-poe-trade-native-focus; Wayland-only game "
-                "validation and quick-check cursor tracking are unavailable."));
+                "and enable awakened-poe-trade-native-focus; game focus "
+                "recognition and quick-check cursor tracking are unavailable."));
         }
     });
     return true;
@@ -309,6 +316,15 @@ void NativeHost::handleEvent(const QString &name, const QJsonValue &payload)
             payload.toObject().value(QStringLiteral("token")).toString());
         return;
     }
+    if (name == QStringLiteral("CLIENT->MAIN::begin-number-capture")) {
+        m_shortcuts.beginNumberCapture(
+            payload.toObject().value(QStringLiteral("token")).toString());
+        return;
+    }
+    if (name == QStringLiteral("CLIENT->MAIN::cancel-number-capture")) {
+        m_shortcuts.cancelNumberCapture();
+        return;
+    }
     if (name == QStringLiteral("CLIENT->MAIN::save-config")) {
         const QJsonObject object = payload.toObject();
         const QString contents = object.value(QStringLiteral("contents")).toString();
@@ -367,22 +383,14 @@ void NativeHost::applyHostConfig(const HostConfig &config)
         QStringLiteral("Ctrl + Enter"), QStringLiteral("Home"),
         QStringLiteral("Delete"), QStringLiteral("Enter"),
         QStringLiteral("ArrowUp"), QStringLiteral("ArrowRight"),
-        QStringLiteral("ArrowLeft"), itemCopyChord(m_gameConfig.showModsKey())
+        QStringLiteral("ArrowLeft"),
+        advancedItemCopyChord(m_gameConfig.showModsKey())
     };
     m_shortcuts.update(config, reservedShortcuts);
     m_shortcuts.setGameActive(m_gameWindow.isGameActive(), m_gameWindow.isKnown());
     m_gameLog.restart(config.clientLog);
     m_inputMonitor.setEnabled(config.stashScroll);
     m_heistOcr.setLanguage(config.language);
-}
-
-QString NativeHost::itemCopyChord(const QString &advancedDescriptionsKey)
-{
-    Q_UNUSED(advancedDescriptionsKey);
-    // PoE's clipboard export is Ctrl+C. The advanced-description display key
-    // affects the tooltip, not the exported item text, and combining it here
-    // prevents native Wayland/Proton from producing a clipboard offer.
-    return QStringLiteral("Ctrl + C");
 }
 
 void NativeHost::performAction(const QJsonObject &action,
@@ -475,7 +483,8 @@ void NativeHost::copyItem(const QJsonObject &action, const QString &triggeringSh
             // popup's lifetime.
         });
 
-    const QString chord = itemCopyChord(m_gameConfig.showModsKey());
+    const QString chord =
+        advancedItemCopyChord(m_gameConfig.showModsKey());
     const auto injectCopy = [this, chord] {
         if (!m_clipboard.isCapturing()) return;
         m_input.sendChord(chord, {}, [this, chord](bool ok) {

@@ -51,8 +51,6 @@ private:
     void sendVisibility(bool visible);
     void sendFocusState(bool usingHotkey = false);
     void logStartupDiagnostics();
-    static QString itemCopyChord(const QString &advancedDescriptionsKey);
-
     NativeOptions m_options;
     Logger m_logger;
     ConfigStore m_configStore;

@@ -82,8 +82,8 @@ enumerate or focus other clients. On KDE, the optional
 resource class, PID, geometry, client protocol, and cursor position to the host
 over a private session D-Bus service. It neither captures key contents nor
 changes the active window. When the bridge is connected, game actions are
-disabled while Path of Exile is not active or is running through XWayland,
-matching the native host's Wayland-only focus policy. The
+disabled while Path of Exile is not active. Native Wayland is the supported
+game-client target. The
 overlay-toggle action remains registered only so an active overlay can be
 closed; opening it from unrelated applications is rejected. The dispatcher
 repeats the check as defense in depth.

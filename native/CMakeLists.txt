@@ -18,7 +18,7 @@ find_package(Qt6 6.6 REQUIRED COMPONENTS
   Core Gui Widgets Network WebEngineCore WebEngineWidgets DBus Concurrent
 )
 find_package(KF6 6.0 REQUIRED COMPONENTS
-  GlobalAccel
+  GlobalAccel WindowSystem
 )
 find_package(LayerShellQt REQUIRED)
 find_package(OpenCV REQUIRED COMPONENTS core imgproc imgcodecs)
@@ -85,6 +85,7 @@ target_link_libraries(awakened-poe-trade-native PRIVATE
   Qt6::Core Qt6::Gui Qt6::Widgets Qt6::Network
   Qt6::WebEngineCore Qt6::WebEngineWidgets Qt6::DBus Qt6::Concurrent
   KF6::GlobalAccel
+  KF6::WindowSystem
   LayerShellQt::Interface
 )
 
@@ -105,6 +106,8 @@ if(BUILD_TESTING)
     tests/NativeCoreTests.cpp
     src/Types.h
     src/Logger.h src/Logger.cpp
+    src/ConfigStore.h src/ConfigStore.cpp
+    src/EventServer.h src/EventServer.cpp
     src/ClipboardService.h src/ClipboardService.cpp
     src/GameConfigReader.h src/GameConfigReader.cpp
     src/GameLogWatcher.h src/GameLogWatcher.cpp
@@ -114,6 +117,7 @@ if(BUILD_TESTING)
   )
   target_include_directories(awakened-poe-trade-native-tests PRIVATE src)
   target_compile_definitions(awakened-poe-trade-native-tests PRIVATE
+    APT_NATIVE_VERSION="${APT_NATIVE_VERSION}"
     QT_NO_CAST_FROM_ASCII
     QT_NO_CAST_TO_ASCII
   )

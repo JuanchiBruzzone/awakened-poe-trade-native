@@ -47,6 +47,7 @@ private slots:
 
 private:
     void configureLayerShell();
+    void openExternalUrl(const QUrl &url);
     void setUiVisible(bool visible);
 
     QWebEngineView *m_view;

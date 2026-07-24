@@ -29,6 +29,7 @@ public:
                          ConfigStore *configStore,
                          Logger *logger,
                          QObject *parent = nullptr);
+    ~EventServer() override;
 
     bool listen(const QHostAddress &address = QHostAddress::LocalHost, quint16 port = 0);
     quint16 port() const;

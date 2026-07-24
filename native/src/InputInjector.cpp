@@ -110,9 +110,24 @@ void InputInjector::sendChord(const QString &requiredChord,
         }
     }
 
-    for (const int code : syntheticModifiers) args << QStringLiteral("%1:1").arg(code);
-    for (const int code : normalKeys) {
-        args << QStringLiteral("%1:1").arg(code) << QStringLiteral("%1:0").arg(code);
+    for (const int code : syntheticModifiers) {
+        args << QStringLiteral("%1:1").arg(code);
+    }
+    // A chord can include a non-modifier hold key (for example PoE's
+    // user-configured "Ctrl + D" advanced-description binding merged with
+    // Ctrl+C). Hold every key except the final key, tap the final key, then
+    // release the held keys in reverse order.
+    for (auto it = normalKeys.cbegin(); it != normalKeys.cend(); ++it) {
+        args << QStringLiteral("%1:1").arg(*it);
+        if (std::next(it) == normalKeys.cend()) {
+            args << QStringLiteral("%1:0").arg(*it);
+        }
+    }
+    if (normalKeys.size() > 1) {
+        for (auto it = std::next(normalKeys.crbegin());
+             it != normalKeys.crend(); ++it) {
+            args << QStringLiteral("%1:0").arg(*it);
+        }
     }
     for (auto it = syntheticModifiers.crbegin(); it != syntheticModifiers.crend(); ++it) {
         args << QStringLiteral("%1:0").arg(*it);

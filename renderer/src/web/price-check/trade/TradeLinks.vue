@@ -15,6 +15,7 @@ import { useI18n } from 'vue-i18n'
 import { Host } from '@/web/background/IPC'
 import { AppConfig } from '@/web/Config'
 import { PriceCheckWidget } from '@/web/overlay/widgets'
+import { WidgetManager } from '@/web/overlay/interfaces'
 
 export default defineComponent({
   props: {
@@ -25,6 +26,7 @@ export default defineComponent({
   },
   setup (props) {
     const showBrowser = inject<(url: string) => void>('builtin-browser')!
+    const wm = inject<WidgetManager>('wm')!
     const { t } = useI18n()
 
     return {
@@ -37,6 +39,11 @@ export default defineComponent({
       open (isExternal: boolean) {
         const link = props.getLink()
         if (isExternal) {
+          const priceCheck = AppConfig('price-check') as PriceCheckWidget
+          wm.hide(priceCheck.wmId)
+          // The native host obtains an xdg-activation token from this click
+          // before making the overlay passive. Focusing PoE here would consume
+          // the interaction serial and prevent the browser from activating.
           window.open(link)
         } else {
           showBrowser(link)

@@ -7,9 +7,7 @@ integration and release packaging use Arch Linux. Other distributions can work
 when they provide compatible Qt 6, KDE Frameworks 6, LayerShellQt, and WebEngine
 packages, but they are not release-tested automatically.
 
-Both the desktop session and Path of Exile must be native Wayland. X11 desktop
-sessions and PoE running through XWayland are unsupported and are identified in
-startup logs.
+Both the desktop session and Path of Exile are expected to use native Wayland.
 
 ## Runtime components
 
@@ -33,7 +31,8 @@ package, but Linux security boundaries still require the host services above.
 Runtime:
 
 ```bash
-sudo pacman -S --needed ydotool wl-clipboard kglobalaccel kpackage kconfig
+sudo pacman -S --needed \
+  ydotool wl-clipboard kglobalaccel kwindowsystem kpackage kconfig
 ```
 
 Source build:
@@ -42,7 +41,7 @@ Source build:
 sudo pacman -S --needed \
   base-devel git cmake ninja extra-cmake-modules \
   qt6-base qt6-webengine qt6-svg qt6-imageformats layer-shell-qt \
-  kglobalaccel kpackage kconfig \
+  kglobalaccel kwindowsystem kpackage kconfig \
   opencv tesseract tesseract-data-eng tesseract-data-rus \
   nodejs npm curl file patchelf appstream
 ```
@@ -50,7 +49,7 @@ sudo pacman -S --needed \
 Package names differ on other distributions. Search for packages providing:
 
 - Qt 6 Core, GUI, Widgets, Network, DBus, WebEngine, and Concurrent;
-- KDE Frameworks 6 GlobalAccel;
+- KDE Frameworks 6 GlobalAccel and WindowSystem;
 - LayerShellQt 6;
 - OpenCV core/image processing;
 - Tesseract development files;

@@ -2,6 +2,7 @@
 
 #include "Logger.h"
 
+#include <KWaylandExtras>
 #include <LayerShellQt/Window>
 
 #include <QCursor>
@@ -10,8 +11,12 @@
 #include <QGuiApplication>
 #include <QHBoxLayout>
 #include <QKeyEvent>
+#include <QProcess>
+#include <QProcessEnvironment>
 #include <QRegion>
 #include <QScreen>
+#include <QStandardPaths>
+#include <QTimer>
 #include <QWebEngineNavigationRequest>
 #include <QWebEngineNewWindowRequest>
 #include <QWebEnginePage>
@@ -26,6 +31,26 @@
 namespace AptNative {
 
 namespace {
+bool openExternalWithoutLayerShell(const QUrl &url,
+                                   const QString &activationToken = {})
+{
+    const QString opener = QStandardPaths::findExecutable(
+        QStringLiteral("xdg-open"));
+    if (opener.isEmpty()) return QDesktopServices::openUrl(url);
+
+    QProcess process;
+    QProcessEnvironment environment = QProcessEnvironment::systemEnvironment();
+    environment.remove(QStringLiteral("QT_WAYLAND_SHELL_INTEGRATION"));
+    if (!activationToken.isEmpty()) {
+        environment.insert(
+            QStringLiteral("XDG_ACTIVATION_TOKEN"), activationToken);
+    }
+    process.setProcessEnvironment(environment);
+    process.setProgram(opener);
+    process.setArguments({url.toString(QUrl::FullyEncoded)});
+    return process.startDetached();
+}
+
 class OverlayWebView final : public QWebEngineView {
 public:
     explicit OverlayWebView(QWidget *parent = nullptr) : QWebEngineView(parent) {}
@@ -116,23 +141,25 @@ OverlayWindow::OverlayWindow(QString profilePath,
         emit pageLoaded();
     });
     connect(page, &QWebEnginePage::newWindowRequested, this,
-            [](QWebEngineNewWindowRequest &request) {
-        if (request.requestedUrl().isValid()) QDesktopServices::openUrl(request.requestedUrl());
+            [this](QWebEngineNewWindowRequest &request) {
+        const QUrl url = request.requestedUrl();
+        if (!url.isValid()) return;
+        openExternalUrl(url);
     });
     connect(page, &QWebEnginePage::navigationRequested, this,
-            [](QWebEngineNavigationRequest &request) {
+            [this](QWebEngineNavigationRequest &request) {
         const QUrl url = request.url();
         const bool local = url.host() == QStringLiteral("127.0.0.1") ||
                            url.host() == QStringLiteral("localhost");
         if (request.isMainFrame() && !local && url.scheme().startsWith(QStringLiteral("http"))) {
-            QDesktopServices::openUrl(url);
+            openExternalUrl(url);
             request.reject();
         }
             });
     connect(browserPage, &QWebEnginePage::newWindowRequested, this,
-            [](QWebEngineNewWindowRequest &request) {
+            [this](QWebEngineNewWindowRequest &request) {
         if (request.requestedUrl().isValid()) {
-            QDesktopServices::openUrl(request.requestedUrl());
+            openExternalUrl(request.requestedUrl());
         }
     });
 
@@ -217,6 +244,29 @@ void OverlayWindow::configureLayerShell()
 void OverlayWindow::load(const QUrl &url)
 {
     m_view->load(url);
+}
+
+void OverlayWindow::openExternalUrl(const QUrl &url)
+{
+    if (!url.isValid()) return;
+
+    if (m_useLayerShell && windowHandle()) {
+        // The Trade click supplies a real Wayland input serial. Request the
+        // compositor's one-time activation token before making the overlay
+        // non-interactive, then pass it only to the external launcher.
+        auto tokenFuture = KWaylandExtras::xdgActivationToken(
+            windowHandle(), QString{});
+        setInteractive(false);
+        tokenFuture.then(this, [url](const QString &token) {
+            openExternalWithoutLayerShell(url, token);
+        });
+        return;
+    }
+
+    setInteractive(false);
+    QTimer::singleShot(0, this, [url] {
+        openExternalWithoutLayerShell(url);
+    });
 }
 
 void OverlayWindow::setInteractive(bool interactive)
@@ -319,6 +369,7 @@ void OverlayWindow::syncEmbeddedBrowser()
         m_browserView->setGeometry(geometry);
         m_browserView->show();
         m_browserView->raise();
+        m_browserView->setFocus(Qt::OtherFocusReason);
     });
 }
 

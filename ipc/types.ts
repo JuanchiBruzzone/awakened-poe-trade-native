@@ -78,6 +78,9 @@ export type IpcEvent =
   IpcOcrText |
   IpcBeginHotkeyCapture |
   IpcHotkeyCaptured |
+  IpcBeginNumberCapture |
+  IpcCancelNumberCapture |
+  IpcNumberCaptured |
   IpcConfigChanged |
   IpcUserAction
 
@@ -142,6 +145,22 @@ type IpcHotkeyCaptured =
   Event<'MAIN->CLIENT::hotkey-captured', {
     token: string
     key: string | null
+  }>
+
+type IpcBeginNumberCapture =
+  Event<'CLIENT->MAIN::begin-number-capture', {
+    token: string
+  }>
+
+type IpcCancelNumberCapture =
+  Event<'CLIENT->MAIN::cancel-number-capture', {
+    token: string
+  }>
+
+type IpcNumberCaptured =
+  Event<'MAIN->CLIENT::number-captured', {
+    token: string
+    key: string
   }>
 
 type IpcLogEntry =

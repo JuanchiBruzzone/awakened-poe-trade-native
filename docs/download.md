@@ -40,7 +40,7 @@ sha256sum -c Awakened-PoE-Trade-Native-*.AppImage.sha256
 The AppImage checks and logs these host integrations at launch. Read
 [Linux dependencies and setup](./linux-dependencies) before running it.
 
-Windows, macOS, X11, XWayland PoE windows, and cloud-gaming sessions are not
-supported by this native distribution. Use
+Windows, macOS, X11 desktop sessions, XWayland game clients, and cloud-gaming
+sessions are outside this native distribution's supported target. Use
 [upstream Awakened PoE Trade](https://github.com/SnosMe/awakened-poe-trade)
 for its supported platforms.

@@ -70,12 +70,12 @@ upstream project and remains dependent on its continued contributions.
 - AppImage packaging and native release updates
 - Upstream compatibility checks and a documented synchronization workflow
 
-The live-tested configuration is Path of Exile 1 running natively on Plasma Wayland. The shared renderer and trade behavior remain aligned with upstream Awakened PoE Trade.
+The live-tested and supported configuration is Path of Exile 1 running as a
+native Wayland client on a Plasma Wayland desktop. The shared renderer and
+trade behavior remain aligned with upstream Awakened PoE Trade.
 
 This application is Wayland-only. At startup it checks the desktop session and
-required host tools. The KWin bridge also verifies that Path of Exile itself is
-a native Wayland client; XWayland game windows are rejected with an explicit
-log message.
+required host tools. Path of Exile is also expected to use native Wayland.
 
 ## Download
 
@@ -195,10 +195,10 @@ gh attestation verify Awakened-PoE-Trade-Native-*.AppImage \
 Use the [issue tracker](https://github.com/JuanchiBruzzone/awakened-poe-trade-native/issues)
 for native Linux problems and requests. Before reporting a problem:
 
-1. Confirm Path of Exile, Plasma, and the application are all running under
-   the expected Wayland session.
+1. Confirm Plasma, the application, and Path of Exile are using native
+   Wayland.
 2. Include the application version, Plasma version, distribution, GPU, and
-   whether the log identifies Path of Exile as native Wayland or XWayland.
+   relevant `[GameWindow]` messages.
 3. Include relevant logs without account names, session cookies, trade
    whispers, item contents, or other personal data.
 4. Describe the shortcut pressed, expected result, actual result, and whether

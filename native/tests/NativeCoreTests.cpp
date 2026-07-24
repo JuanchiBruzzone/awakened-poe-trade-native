@@ -1,4 +1,5 @@
 #include "ClipboardService.h"
+#include "EventServer.h"
 #include "GameConfigReader.h"
 #include "GameLogWatcher.h"
 #include "GameWindowTracker.h"
@@ -13,6 +14,9 @@
 #include <QSignalSpy>
 #include <QTemporaryDir>
 #include <QTest>
+#include <QTcpSocket>
+
+#include <memory>
 
 using namespace AptNative;
 
@@ -23,17 +27,20 @@ private slots:
     void hostConfigUsesSafeDefaults();
     void hostConfigReadsRendererPayload();
     void eventEnvelopeOmitsUndefinedPayload();
+    void itemCopyChordIncludesAdvancedDescriptions();
     void loggerStoresAndEmitsEntries();
     void gameConfigReadsAdvancedDescriptionBinding();
     void gameConfigFallsBackForMissingBinding();
     void gameLogWatcherEmitsOnlyAppendedLines();
     void recognizesLocalizedPoeItems();
     void rejectsNonItemClipboardText();
-    void enforcesNativeWaylandGameWindow();
+    void acceptsPoeWindowRegardlessOfProtocolLabel();
     void identifiesPoeApplicationClasses();
     void normalizesNativeReleaseVersions();
     void normalizesInputShortcuts();
     void mapsInputKeysToLinuxCodes();
+    void itemCopyInjectionHoldsCustomAdvancedKey();
+    void eventServerShutsDownWithConnectedClient();
 };
 
 void NativeCoreTests::hostConfigUsesSafeDefaults()
@@ -96,6 +103,23 @@ void NativeCoreTests::eventEnvelopeOmitsUndefinedPayload()
     const QJsonObject withPayload =
         makeEvent(QStringLiteral("MAIN->OVERLAY::visibility"), payload);
     QCOMPARE(withPayload.value(QStringLiteral("payload")).toObject(), payload);
+}
+
+void NativeCoreTests::itemCopyChordIncludesAdvancedDescriptions()
+{
+    QCOMPARE(advancedItemCopyChord(QStringLiteral("Alt")),
+             QStringLiteral("Ctrl + Alt + C"));
+    QCOMPARE(advancedItemCopyChord(QStringLiteral("Ctrl + D")),
+             QStringLiteral("Ctrl + D + C"));
+    QCOMPARE(advancedItemCopyChord(QString{}), QStringLiteral("Ctrl + C"));
+}
+
+void NativeCoreTests::itemCopyInjectionHoldsCustomAdvancedKey()
+{
+    QCOMPARE(InputInjector::shortcutTokens(
+                 advancedItemCopyChord(QStringLiteral("Ctrl + D"))),
+             QStringList({QStringLiteral("Ctrl"), QStringLiteral("D"),
+                          QStringLiteral("C")}));
 }
 
 void NativeCoreTests::loggerStoresAndEmitsEntries()
@@ -212,7 +236,7 @@ void NativeCoreTests::rejectsNonItemClipboardText()
         QStringLiteral("__APT_FORCE_EMPTY_123")));
 }
 
-void NativeCoreTests::enforcesNativeWaylandGameWindow()
+void NativeCoreTests::acceptsPoeWindowRegardlessOfProtocolLabel()
 {
     const QString title = QStringLiteral("Path of Exile");
     const QString gameClass = QStringLiteral("steam_app_238960");
@@ -220,7 +244,7 @@ void NativeCoreTests::enforcesNativeWaylandGameWindow()
     QVERIFY(GameWindowTracker::matchesGameWindow({}, gameClass, title));
     QVERIFY(GameWindowTracker::isSupportedGameWindow(
         {}, gameClass, title, true));
-    QVERIFY(!GameWindowTracker::isSupportedGameWindow(
+    QVERIFY(GameWindowTracker::isSupportedGameWindow(
         {}, gameClass, title, false));
     QVERIFY(!GameWindowTracker::isSupportedGameWindow(
         QStringLiteral("Firefox"), QStringLiteral("firefox"), title, true));
@@ -268,6 +292,34 @@ void NativeCoreTests::mapsInputKeysToLinuxCodes()
     QCOMPARE(InputInjector::linuxKeyCode(QStringLiteral("D")), 32);
     QCOMPARE(InputInjector::linuxKeyCode(QStringLiteral("F5")), 63);
     QCOMPARE(InputInjector::linuxKeyCode(QStringLiteral("Unknown")), -1);
+}
+
+void NativeCoreTests::eventServerShutsDownWithConnectedClient()
+{
+    Logger logger;
+    auto server = std::make_unique<EventServer>(
+        QString{}, nullptr, &logger);
+    QVERIFY(server->listen());
+
+    QTcpSocket client;
+    QSignalSpy connected(server.get(), &EventServer::clientConnected);
+    client.connectToHost(QHostAddress::LocalHost, server->port());
+    QVERIFY(client.waitForConnected());
+    client.write(
+        "GET /events HTTP/1.1\r\n"
+        "Host: 127.0.0.1\r\n"
+        "Connection: Upgrade\r\n"
+        "Upgrade: websocket\r\n"
+        "Sec-WebSocket-Version: 13\r\n"
+        "Sec-WebSocket-Key: dGhlIHNhbXBsZSBub25jZQ==\r\n\r\n");
+    QVERIFY(client.waitForBytesWritten());
+    QTRY_COMPARE_WITH_TIMEOUT(connected.count(), 1, 1000);
+
+    // Regression: QTcpServer used to destroy this connected socket after the
+    // EventServer client map, invoking removeClient() on already-freed state.
+    server.reset();
+    QVERIFY(client.state() == QAbstractSocket::UnconnectedState ||
+            client.waitForDisconnected(1000));
 }
 
 QTEST_GUILESS_MAIN(NativeCoreTests)

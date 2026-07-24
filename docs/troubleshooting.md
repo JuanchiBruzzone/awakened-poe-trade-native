@@ -59,26 +59,6 @@ kpackagetool6 --type=KWin/Script --list | \
 Do not use `--steal-shortcuts` routinely. It exists for controlled diagnostics
 and can replace another application's global binding.
 
-## Path of Exile is reported as XWayland
-
-The native host supports only a Plasma Wayland desktop with Path of Exile
-running as a native Wayland client. When KWin reports an XWayland PoE window,
-the host logs:
-
-```text
-error [GameWindow] Path of Exile 1 is running through XWayland.
-```
-
-Gameplay shortcuts remain disabled for that window. Relaunch the game with its
-native Wayland path enabled, then look for:
-
-```text
-info [GameWindow] Path of Exile 1 is running as a native Wayland client.
-```
-
-Do not bypass this check: XWayland has different focus, stacking, clipboard,
-and pointer behavior and is outside the supported target.
-
 ## Overlay appears below the game
 
 - Confirm the session is Wayland:

@@ -4,12 +4,52 @@
 #include <QApplication>
 #include <QDesktopServices>
 #include <QIcon>
-#include <QMessageBox>
 #include <QMenu>
+#include <QProcess>
+#include <QProcessEnvironment>
+#include <QStandardPaths>
 #include <QStyle>
 #include <QSystemTrayIcon>
+#include <QTimer>
 
 namespace AptNative {
+
+namespace {
+bool startDetachedWithoutLayerShell(const QString &program,
+                                    const QStringList &arguments)
+{
+    QProcess process;
+    QProcessEnvironment environment = QProcessEnvironment::systemEnvironment();
+    // The native overlay selects layer-shell globally before QApplication is
+    // created. Never leak that Qt-specific setting into Dolphin, a browser,
+    // or another external desktop application.
+    environment.remove(QStringLiteral("QT_WAYLAND_SHELL_INTEGRATION"));
+    process.setProcessEnvironment(environment);
+    process.setProgram(program);
+    process.setArguments(arguments);
+    return process.startDetached();
+}
+
+bool openWithDesktopHandler(const QUrl &url)
+{
+    const QString opener = QStandardPaths::findExecutable(
+        QStringLiteral("xdg-open"));
+    if (opener.isEmpty()) return QDesktopServices::openUrl(url);
+    return startDetachedWithoutLayerShell(
+        opener, {url.toString(QUrl::FullyEncoded)});
+}
+
+bool openConfigDirectory(const QString &directory)
+{
+    const QString dolphin = QStandardPaths::findExecutable(
+        QStringLiteral("dolphin"));
+    if (!dolphin.isEmpty()) {
+        return startDetachedWithoutLayerShell(
+            dolphin, {QStringLiteral("--new-window"), directory});
+    }
+    return openWithDesktopHandler(QUrl::fromLocalFile(directory));
+}
+}
 
 AppTray::AppTray(QObject *parent) : QObject(parent), m_tray(new QSystemTrayIcon(this))
 {
@@ -20,20 +60,31 @@ AppTray::AppTray(QObject *parent) : QObject(parent), m_tray(new QSystemTrayIcon(
     auto *configFolder = menu->addAction(QStringLiteral("Open config folder"));
     auto *quit = menu->addAction(QStringLiteral("Quit"));
 
-    connect(settings, &QAction::triggered, this, [this] {
-        QMessageBox::information(nullptr,
+    connect(settings, &QAction::triggered, this, [this, menu] {
+        menu->close();
+        m_tray->showMessage(
             QStringLiteral("Settings"),
             QStringLiteral("Open Path of Exile and press \"%1\". "
                            "Click on the button with cog icon there.")
-                .arg(m_overlayKey));
+                .arg(m_overlayKey),
+            QSystemTrayIcon::Information,
+            8000);
     });
-    connect(browser, &QAction::triggered, this, [this] {
-        if (m_appUrl.isValid()) QDesktopServices::openUrl(m_appUrl);
+    connect(browser, &QAction::triggered, this, [this, menu] {
+        menu->close();
+        const QUrl url = m_appUrl;
+        QTimer::singleShot(0, this, [url] {
+            if (url.isValid()) openWithDesktopHandler(url);
+        });
     });
-    connect(configFolder, &QAction::triggered, this, [this] {
-        if (!m_dataDirectory.isEmpty()) {
-            QDesktopServices::openUrl(QUrl::fromLocalFile(m_dataDirectory));
-        }
+    connect(configFolder, &QAction::triggered, this, [this, menu] {
+        menu->close();
+        const QString dataDirectory = m_dataDirectory;
+        QTimer::singleShot(0, this, [dataDirectory] {
+            if (!dataDirectory.isEmpty()) {
+                openConfigDirectory(dataDirectory);
+            }
+        });
     });
     connect(quit, &QAction::triggered, this, &AppTray::quitRequested);
 

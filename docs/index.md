@@ -9,9 +9,8 @@ Awakened PoE Trade Native carries the proven
 interface, parser, trade logic, data, and translations onto a native C++20
 Qt/KDE host.
 
-> **Wayland only:** both KDE Plasma and Path of Exile 1 must run as native
-> Wayland clients. X11 and XWayland game windows are intentionally rejected
-> and identified in the application log.
+> **Wayland/Wayland target:** KDE Plasma, the native host, and Path of Exile 1
+> are expected to run with native Wayland.
 
 ## What the native host adds
 
@@ -20,8 +19,7 @@ Qt/KDE host.
 - KDE global shortcuts, a system tray, native clipboard handling, and reliable
   Proton/Wayland input.
 - Quick and locked price-check modes with compositor cursor tracking.
-- Startup diagnostics for required host tools and explicit Wayland protocol
-  reporting for PoE.
+- Startup diagnostics for required host tools and PoE window recognition.
 - A self-loading bundled KWin bridge, native Heist OCR, automatic AppImage
   updates, and rollback-safe replacement.
 
