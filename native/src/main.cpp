@@ -35,12 +35,16 @@ QString findRenderer(const QString &requested)
 {
     QStringList candidates;
     if (!requested.isEmpty()) candidates << requested;
+    const QDir executableDir(QCoreApplication::applicationDirPath());
+    // Prefer the renderer installed alongside the executable. In an AppImage
+    // this guarantees that a checkout on the host cannot accidentally replace
+    // the UI bundled and verified as part of the release artifact.
+    candidates << executableDir.filePath(
+        QStringLiteral("../share/awakened-poe-trade-native/renderer"));
     const QString compiled = QStringLiteral(APT_RENDERER_DEFAULT_PATH);
     if (!compiled.isEmpty()) candidates << compiled;
     candidates << QDir::current().filePath(QStringLiteral("renderer/dist"));
-    const QDir executableDir(QCoreApplication::applicationDirPath());
     candidates << executableDir.filePath(QStringLiteral("../../renderer/dist"));
-    candidates << executableDir.filePath(QStringLiteral("../share/awakened-poe-trade-native/renderer"));
 
     for (const QString &candidate : candidates) {
         const QString absolute = QFileInfo(candidate).absoluteFilePath();

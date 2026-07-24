@@ -1,5 +1,6 @@
 #include "OverlayWindow.h"
 
+#include "DesktopLaunch.h"
 #include "Logger.h"
 
 #include <KWaylandExtras>
@@ -11,8 +12,6 @@
 #include <QGuiApplication>
 #include <QHBoxLayout>
 #include <QKeyEvent>
-#include <QProcess>
-#include <QProcessEnvironment>
 #include <QRegion>
 #include <QScreen>
 #include <QStandardPaths>
@@ -38,17 +37,8 @@ bool openExternalWithoutLayerShell(const QUrl &url,
         QStringLiteral("xdg-open"));
     if (opener.isEmpty()) return QDesktopServices::openUrl(url);
 
-    QProcess process;
-    QProcessEnvironment environment = QProcessEnvironment::systemEnvironment();
-    environment.remove(QStringLiteral("QT_WAYLAND_SHELL_INTEGRATION"));
-    if (!activationToken.isEmpty()) {
-        environment.insert(
-            QStringLiteral("XDG_ACTIVATION_TOKEN"), activationToken);
-    }
-    process.setProcessEnvironment(environment);
-    process.setProgram(opener);
-    process.setArguments({url.toString(QUrl::FullyEncoded)});
-    return process.startDetached();
+    return DesktopLaunch::startDetached(
+        opener, {url.toString(QUrl::FullyEncoded)}, activationToken);
 }
 
 class OverlayWebView final : public QWebEngineView {

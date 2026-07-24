@@ -12,6 +12,10 @@ changes remain documented by the upstream project.
   because the release packager silently omitted this plugin.
 - Added release verification that extracts the completed AppImage and fails
   when the required Wayland EGL plugin is absent or has unresolved libraries.
+- Prevented the packaged application from inheriting a renderer from a nearby
+  source checkout instead of using its verified embedded renderer.
+- Isolated system-browser and file-manager launches from AppImage and
+  layer-shell Qt environment variables.
 
 ## 3.28.104-native.3
 

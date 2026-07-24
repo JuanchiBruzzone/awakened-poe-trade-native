@@ -1,12 +1,12 @@
 #include "AppTray.h"
 
+#include "DesktopLaunch.h"
+
 #include <QAction>
 #include <QApplication>
 #include <QDesktopServices>
 #include <QIcon>
 #include <QMenu>
-#include <QProcess>
-#include <QProcessEnvironment>
 #include <QStandardPaths>
 #include <QStyle>
 #include <QSystemTrayIcon>
@@ -18,16 +18,7 @@ namespace {
 bool startDetachedWithoutLayerShell(const QString &program,
                                     const QStringList &arguments)
 {
-    QProcess process;
-    QProcessEnvironment environment = QProcessEnvironment::systemEnvironment();
-    // The native overlay selects layer-shell globally before QApplication is
-    // created. Never leak that Qt-specific setting into Dolphin, a browser,
-    // or another external desktop application.
-    environment.remove(QStringLiteral("QT_WAYLAND_SHELL_INTEGRATION"));
-    process.setProcessEnvironment(environment);
-    process.setProgram(program);
-    process.setArguments(arguments);
-    return process.startDetached();
+    return DesktopLaunch::startDetached(program, arguments);
 }
 
 bool openWithDesktopHandler(const QUrl &url)

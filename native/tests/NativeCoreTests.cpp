@@ -1,4 +1,5 @@
 #include "ClipboardService.h"
+#include "DesktopLaunch.h"
 #include "EventServer.h"
 #include "GameConfigReader.h"
 #include "GameLogWatcher.h"
@@ -41,6 +42,7 @@ private slots:
     void mapsInputKeysToLinuxCodes();
     void itemCopyInjectionHoldsCustomAdvancedKey();
     void eventServerShutsDownWithConnectedClient();
+    void desktopLaunchRemovesPrivateAppImageEnvironment();
 };
 
 void NativeCoreTests::hostConfigUsesSafeDefaults()
@@ -320,6 +322,29 @@ void NativeCoreTests::eventServerShutsDownWithConnectedClient()
     server.reset();
     QVERIFY(client.state() == QAbstractSocket::UnconnectedState ||
             client.waitForDisconnected(1000));
+}
+
+void NativeCoreTests::desktopLaunchRemovesPrivateAppImageEnvironment()
+{
+    qputenv("APPDIR", QByteArrayLiteral("/tmp/fake-appdir"));
+    qputenv("QT_PLUGIN_PATH", QByteArrayLiteral("/tmp/fake-plugins"));
+    qputenv("QT_WAYLAND_SHELL_INTEGRATION", QByteArrayLiteral("layer-shell"));
+    qputenv("XDG_ACTIVATION_TOKEN", QByteArrayLiteral("stale-token"));
+
+    const QProcessEnvironment environment =
+        DesktopLaunch::cleanEnvironment(QStringLiteral("fresh-token"));
+
+    QVERIFY(!environment.contains(QStringLiteral("APPDIR")));
+    QVERIFY(!environment.contains(QStringLiteral("QT_PLUGIN_PATH")));
+    QVERIFY(!environment.contains(
+        QStringLiteral("QT_WAYLAND_SHELL_INTEGRATION")));
+    QCOMPARE(environment.value(QStringLiteral("XDG_ACTIVATION_TOKEN")),
+             QStringLiteral("fresh-token"));
+
+    qunsetenv("APPDIR");
+    qunsetenv("QT_PLUGIN_PATH");
+    qunsetenv("QT_WAYLAND_SHELL_INTEGRATION");
+    qunsetenv("XDG_ACTIVATION_TOKEN");
 }
 
 QTEST_GUILESS_MAIN(NativeCoreTests)
