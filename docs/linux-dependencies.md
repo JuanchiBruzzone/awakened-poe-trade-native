@@ -41,7 +41,7 @@ Source build:
 ```bash
 sudo pacman -S --needed \
   base-devel git cmake ninja extra-cmake-modules \
-  qt6-base qt6-webengine layer-shell-qt \
+  qt6-base qt6-webengine qt6-svg layer-shell-qt \
   kglobalaccel kpackage kconfig \
   opencv tesseract tesseract-data-eng tesseract-data-rus \
   nodejs npm curl file patchelf appstream
