@@ -64,9 +64,8 @@ int main(int argc, char **argv)
         qputenv("QT_QPA_PLATFORM", QByteArrayLiteral("offscreen"));
     }
     if (layerShellRequested) {
-        // Keep this in the same pre-QApplication order as the proven EE2
-        // implementation. LayerShellQt must own the first shell integration
-        // selected for the overlay's QWaylandWindow.
+        // LayerShellQt must be enabled before QApplication so it owns the
+        // first shell integration selected for the overlay's QWaylandWindow.
         qputenv("QT_WAYLAND_SHELL_INTEGRATION", QByteArrayLiteral("layer-shell"));
         LayerShellQt::Shell::useLayerShell();
     }

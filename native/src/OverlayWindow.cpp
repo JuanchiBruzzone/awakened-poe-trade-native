@@ -155,9 +155,9 @@ OverlayWindow::OverlayWindow(QString profilePath,
             this, &OverlayWindow::syncEmbeddedBrowser);
     m_browserSyncTimer.start();
 
-    // Do not create the native surface in the constructor. The working EE2
-    // path assigns the layer-shell role while the overlay is still hidden,
-    // immediately before its first show.
+    // Do not create the native surface in the constructor. Assign the
+    // layer-shell role while the overlay is still hidden, immediately before
+    // its first show.
     setInteractive(false);
 }
 

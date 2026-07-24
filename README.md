@@ -221,8 +221,6 @@ license attribution while integrating it.
 
 Additional sincere thanks go to:
 
-- [Exiled Exchange 2](https://github.com/Kvan7/Exiled-Exchange-2) and its
-  contributors, whose Linux work provided valuable reference and experience.
 - [libuiohook](https://github.com/kwhat/libuiohook), [RePoE](https://github.com/brather1ng/RePoE),
   [poeprices.info](https://www.poeprices.info/), and
   [poe.ninja](https://poe.ninja/) for important parts of the wider ecosystem

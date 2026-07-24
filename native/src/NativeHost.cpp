@@ -486,8 +486,8 @@ void NativeHost::copyItem(const QJsonObject &action, const QString &triggeringSh
         });
     };
     // KGlobalAccel reports the action before Proton has fully observed the
-    // triggering key release. EE2's proven timing avoids racing that state and
-    // retries once for Wine/Wayland clipboard latency.
+    // triggering key release. This timing avoids racing that state and retries
+    // once for Wine/Wayland clipboard latency.
     QTimer::singleShot(120, this, injectCopy);
     QTimer::singleShot(420, this, injectCopy);
 }
