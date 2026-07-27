@@ -40,6 +40,7 @@ add_executable(awakened-poe-trade-native
   src/Types.h
   src/Logger.h src/Logger.cpp
   src/DesktopLaunch.h src/DesktopLaunch.cpp
+  src/RuntimePaths.h src/RuntimePaths.cpp
   src/ConfigStore.h src/ConfigStore.cpp
   src/EventServer.h src/EventServer.cpp
   src/OverlayWindow.h src/OverlayWindow.cpp
@@ -108,6 +109,7 @@ if(BUILD_TESTING)
     src/Types.h
     src/Logger.h src/Logger.cpp
     src/DesktopLaunch.h src/DesktopLaunch.cpp
+    src/RuntimePaths.h src/RuntimePaths.cpp
     src/ConfigStore.h src/ConfigStore.cpp
     src/EventServer.h src/EventServer.cpp
     src/ClipboardService.h src/ClipboardService.cpp

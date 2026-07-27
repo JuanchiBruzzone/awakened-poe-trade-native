@@ -20,6 +20,14 @@
   <url type="bugtracker">https://github.com/JuanchiBruzzone/awakened-poe-trade-native/issues</url>
   <url type="vcs-browser">https://github.com/JuanchiBruzzone/awakened-poe-trade-native</url>
   <releases>
+    <release version="3.28.104-native.5" date="2026-07-27">
+      <description>
+        <p>
+          Fixes KWin bridge discovery on clean systems by loading the bridge
+          directly from the AppImage's bundled data directory.
+        </p>
+      </description>
+    </release>
     <release version="3.28.104-native.4" date="2026-07-24">
       <description>
         <p>

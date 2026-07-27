@@ -107,6 +107,8 @@ jobs:
             cd "$extract_dir"
             "$artifact" --appimage-extract >/dev/null
             test -f squashfs-root/usr/plugins/wayland-graphics-integration-client/libqt-plugin-wayland-egl.so
+            test -f squashfs-root/usr/share/kwin/scripts/awakened-poe-trade-native-focus/metadata.json
+            test -f squashfs-root/usr/share/kwin/scripts/awakened-poe-trade-native-focus/contents/code/main.js
           )
 
       - name: Generate SPDX SBOM

@@ -6,10 +6,13 @@
 #include "GameWindowTracker.h"
 #include "InputInjector.h"
 #include "Logger.h"
+#include "RuntimePaths.h"
 #include "Types.h"
 #include "UpdateService.h"
 
+#include <QDir>
 #include <QFile>
+#include <QFileInfo>
 #include <QJsonArray>
 #include <QJsonObject>
 #include <QSignalSpy>
@@ -43,6 +46,7 @@ private slots:
     void itemCopyInjectionHoldsCustomAdvancedKey();
     void eventServerShutsDownWithConnectedClient();
     void desktopLaunchRemovesPrivateAppImageEnvironment();
+    void runtimePathsFindBundledKWinBridge();
 };
 
 void NativeCoreTests::hostConfigUsesSafeDefaults()
@@ -345,6 +349,33 @@ void NativeCoreTests::desktopLaunchRemovesPrivateAppImageEnvironment()
     qunsetenv("QT_PLUGIN_PATH");
     qunsetenv("QT_WAYLAND_SHELL_INTEGRATION");
     qunsetenv("XDG_ACTIVATION_TOKEN");
+}
+
+void NativeCoreTests::runtimePathsFindBundledKWinBridge()
+{
+    QTemporaryDir appImageRoot;
+    QVERIFY(appImageRoot.isValid());
+
+    const QString binaryDirectory =
+        appImageRoot.filePath(QStringLiteral("usr/bin"));
+    const QString bridgeDirectory = appImageRoot.filePath(
+        QStringLiteral(
+            "usr/share/kwin/scripts/awakened-poe-trade-native-focus"));
+    QVERIFY(QDir().mkpath(binaryDirectory));
+    QVERIFY(QDir().mkpath(bridgeDirectory));
+
+    const QString metadata =
+        QDir(bridgeDirectory).filePath(QStringLiteral("metadata.json"));
+    QFile file(metadata);
+    QVERIFY(file.open(QIODevice::WriteOnly | QIODevice::Text));
+    QVERIFY(file.write("{}\n") > 0);
+    file.close();
+
+    QCOMPARE(RuntimePaths::findDataFile(
+                 QStringLiteral(
+                     "kwin/scripts/awakened-poe-trade-native-focus/metadata.json"),
+                 binaryDirectory),
+             QFileInfo(metadata).canonicalFilePath());
 }
 
 QTEST_GUILESS_MAIN(NativeCoreTests)

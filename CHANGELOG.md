@@ -3,6 +3,16 @@
 All notable native-port changes are documented here. Shared Awakened PoE Trade
 changes remain documented by the upstream project.
 
+## 3.28.104-native.5
+
+### Fixed
+
+- Made clean AppImage installations discover and load the bundled KWin bridge
+  directly from the AppImage instead of depending on a previously installed
+  copy under the user's KDE data directory.
+- Added regression coverage for the AppImage `usr/bin` to `usr/share` runtime
+  layout used by the bundled bridge.
+
 ## 3.28.104-native.4
 
 ### Fixed

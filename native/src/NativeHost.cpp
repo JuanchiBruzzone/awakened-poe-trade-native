@@ -1,6 +1,7 @@
 #include "NativeHost.h"
 
 #include "OverlayWindow.h"
+#include "RuntimePaths.h"
 
 #include <QApplication>
 #include <QCursor>
@@ -251,8 +252,7 @@ void NativeHost::logStartupDiagnostics()
     reportExecutable(QStringLiteral("qdbus6"), false);
     reportExecutable(QStringLiteral("kpackagetool6"), false);
 
-    const QString bridgeMetadata = QStandardPaths::locate(
-        QStandardPaths::GenericDataLocation,
+    const QString bridgeMetadata = RuntimePaths::findDataFile(
         QStringLiteral(
             "kwin/scripts/awakened-poe-trade-native-focus/metadata.json"));
     m_logger.write(bridgeMetadata.isEmpty()
