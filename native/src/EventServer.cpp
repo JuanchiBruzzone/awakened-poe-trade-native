@@ -19,6 +19,7 @@
 #include <QUrl>
 #include <QUrlQuery>
 
+#include <algorithm>
 #include <limits>
 #include <utility>
 
@@ -34,7 +35,7 @@ const QSet<QString> AllowedProxyHosts{
     QStringLiteral("www.pathofexile.com"),
     QStringLiteral("ru.pathofexile.com"),
     QStringLiteral("pathofexile.tw"),
-    QStringLiteral("poe.game.daum.net"),
+    QStringLiteral("poe.kakaogames.com"),
     QStringLiteral("poe.ninja"),
     QStringLiteral("www.poeprices.info")
 };
@@ -108,6 +109,33 @@ QUrl EventServer::appUrl() const
 void EventServer::setUpdaterState(const QJsonObject &state)
 {
     m_updaterState = state;
+}
+
+void EventServer::setProxyUserAgent(const QByteArray &userAgent)
+{
+    if (!userAgent.trimmed().isEmpty()) m_proxyUserAgent = userAgent;
+}
+
+bool EventServer::importBrowserCookie(const QNetworkCookie &cookie)
+{
+    QString domain = cookie.domain().trimmed();
+    while (domain.startsWith(QLatin1Char('.'))) domain.removeFirst();
+    const auto allowed = std::find_if(
+        AllowedProxyHosts.cbegin(), AllowedProxyHosts.cend(),
+        [&domain](const QString &host) {
+            return host == domain ||
+                   host.endsWith(QLatin1Char('.') + domain);
+        });
+    if (domain.isEmpty() || allowed == AllowedProxyHosts.cend()) return false;
+
+    QUrl origin;
+    origin.setScheme(cookie.isSecure() ? QStringLiteral("https")
+                                       : QStringLiteral("http"));
+    origin.setHost(*allowed);
+    origin.setPath(cookie.path().isEmpty() ? QStringLiteral("/")
+                                           : cookie.path());
+    m_network.cookieJar()->setCookiesFromUrl({cookie}, origin);
+    return true;
 }
 
 void EventServer::acceptConnections()
@@ -286,7 +314,7 @@ void EventServer::handleProxy(QTcpSocket *socket, const HttpRequest &request)
 
     QNetworkRequest outgoing(destination);
     outgoing.setAttribute(QNetworkRequest::RedirectPolicyAttribute, QNetworkRequest::NoLessSafeRedirectPolicy);
-    outgoing.setRawHeader(QByteArrayLiteral("user-agent"), QByteArrayLiteral("Awakened-PoE-Trade-Native/") + QByteArray(APT_NATIVE_VERSION));
+    outgoing.setRawHeader(QByteArrayLiteral("user-agent"), m_proxyUserAgent);
     outgoing.setRawHeader(QByteArrayLiteral("accept-encoding"), QByteArrayLiteral("identity"));
 
     for (auto it = request.headers.cbegin(); it != request.headers.cend(); ++it) {

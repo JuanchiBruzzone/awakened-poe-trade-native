@@ -188,6 +188,9 @@ bool NativeHost::start()
         m_overlay = new OverlayWindow(m_configStore.dataDirectory(),
                                       m_options.useLayerShell,
                                       &m_logger);
+        m_server.setProxyUserAgent(m_overlay->browserUserAgent());
+        connect(m_overlay, &OverlayWindow::proxyCookieAvailable,
+                &m_server, &EventServer::importBrowserCookie);
         connect(m_overlay, &OverlayWindow::pageLoaded, this, [this] {
             m_server.broadcast(makeEvent(QStringLiteral("MAIN->OVERLAY::overlay-attached")));
             sendVisibility(true);
@@ -416,8 +419,7 @@ void NativeHost::applyHostConfig(const HostConfig &config)
         QStringLiteral("Ctrl + Enter"), QStringLiteral("Home"),
         QStringLiteral("Delete"), QStringLiteral("Enter"),
         QStringLiteral("ArrowUp"), QStringLiteral("ArrowRight"),
-        QStringLiteral("ArrowLeft"),
-        advancedItemCopyChord(m_gameConfig.showModsKey())
+        QStringLiteral("ArrowLeft")
     };
     m_shortcuts.update(config, reservedShortcuts);
     m_shortcuts.setGameActive(m_gameWindow.isGameActive(), m_gameWindow.isKnown());
@@ -516,8 +518,7 @@ void NativeHost::copyItem(const QJsonObject &action, const QString &triggeringSh
             // popup's lifetime.
         });
 
-    const QString chord =
-        advancedItemCopyChord(m_gameConfig.showModsKey());
+    const QString chord = advancedItemCopyChord({});
     const auto injectCopy = [this, chord] {
         if (!m_clipboard.isCapturing()) return;
         m_input.sendChord(chord, {}, [this, chord](bool ok) {

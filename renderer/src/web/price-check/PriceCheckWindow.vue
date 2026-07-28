@@ -240,6 +240,12 @@ export default defineComponent({
       }
     })
 
+    watch(leagues.error, (value) => {
+      if (value === null) {
+        closeBrowser()
+      }
+    })
+
     function closePriceCheck () {
       if (isBrowserShown.value || !Host.isElectron) {
         wm.hide(props.config.wmId)

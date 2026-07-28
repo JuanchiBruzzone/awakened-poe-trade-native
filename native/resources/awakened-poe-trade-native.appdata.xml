@@ -20,6 +20,16 @@
   <url type="bugtracker">https://github.com/JuanchiBruzzone/awakened-poe-trade-native/issues</url>
   <url type="vcs-browser">https://github.com/JuanchiBruzzone/awakened-poe-trade-native</url>
   <releases>
+    <release version="3.29.102-native.1" date="2026-07-28">
+      <description>
+        <p>
+          Integrates Awakened PoE Trade 3.29.102 data and parsing, adds
+          localized Allflame Chart price checks, updates Path of Exile 3.29
+          item capture, and shares official-site browser challenge cookies
+          with the native trade proxy.
+        </p>
+      </description>
+    </release>
     <release version="3.28.104-native.6" date="2026-07-28">
       <description>
         <p>

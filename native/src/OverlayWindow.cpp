@@ -20,6 +20,7 @@
 #include <QWebEngineNewWindowRequest>
 #include <QWebEnginePage>
 #include <QWebEngineProfile>
+#include <QWebEngineCookieStore>
 #include <QWebEngineSettings>
 #include <QWebEngineView>
 #include <QWindow>
@@ -107,6 +108,9 @@ OverlayWindow::OverlayWindow(QString profilePath,
     profile->setHttpUserAgent(profile->httpUserAgent() +
         QStringLiteral(" AwakenedPoETradeNative/%1 Electron/40.9.1")
             .arg(QStringLiteral(APT_NATIVE_VERSION)));
+    connect(profile->cookieStore(), &QWebEngineCookieStore::cookieAdded,
+            this, &OverlayWindow::proxyCookieAvailable);
+    profile->cookieStore()->loadAllCookies();
     auto *page = new QWebEnginePage(profile, m_view);
     m_view->setPage(page);
     auto *browserPage = new QWebEnginePage(profile, m_browserView);
@@ -234,6 +238,11 @@ void OverlayWindow::configureLayerShell()
 void OverlayWindow::load(const QUrl &url)
 {
     m_view->load(url);
+}
+
+QByteArray OverlayWindow::browserUserAgent() const
+{
+    return m_view->page()->profile()->httpUserAgent().toUtf8();
 }
 
 void OverlayWindow::openExternalUrl(const QUrl &url)

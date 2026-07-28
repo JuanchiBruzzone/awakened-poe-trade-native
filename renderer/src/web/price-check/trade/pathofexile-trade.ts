@@ -50,7 +50,8 @@ export const CATEGORY_TO_TRADE_ID = new Map([
   [ItemCategory.Tincture, 'tincture'],
   [ItemCategory.Charm, 'azmeri.charm'],
   [ItemCategory.Idol, 'idol'],
-  [ItemCategory.Graft, 'graft']
+  [ItemCategory.Graft, 'graft'],
+  [ItemCategory.Chart, 'chart']
 ])
 
 const TOTAL_MODS_TEXT = {
@@ -389,6 +390,9 @@ export function createTradeRequest (filters: ItemFilters, stats: StatFilter[]) {
     if (filters.areaLevel.max) {
       propSet(query.filters, 'map_filters.filters.area_level.max', filters.areaLevel.max)
     }
+  }
+  if (filters.chartAreaLevel && !filters.chartAreaLevel.disabled) {
+    propSet(query.filters, 'map_filters.filters.area_level.min', filters.chartAreaLevel.value)
   }
 
   if (filters.heistWingsRevealed && !filters.heistWingsRevealed.disabled) {

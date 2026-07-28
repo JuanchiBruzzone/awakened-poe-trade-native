@@ -2,9 +2,7 @@
 
 #include <QJsonArray>
 #include <QJsonObject>
-#include <QRegularExpression>
 #include <QString>
-#include <QStringList>
 
 namespace AptNative {
 
@@ -47,17 +45,11 @@ inline QJsonObject makeEvent(const QString &name,
 
 inline QString advancedItemCopyChord(const QString &advancedDescriptionsKey)
 {
-    QStringList keys{QStringLiteral("Ctrl")};
-    QString normalized = advancedDescriptionsKey;
-    normalized.replace(QLatin1Char('+'), QLatin1Char(' '));
-    for (const QString &key : normalized.split(
-             QRegularExpression(QStringLiteral("\\s+")), Qt::SkipEmptyParts)) {
-        if (!keys.contains(key, Qt::CaseInsensitive)) keys.append(key);
-    }
-    if (!keys.contains(QStringLiteral("C"), Qt::CaseInsensitive)) {
-        keys.append(QStringLiteral("C"));
-    }
-    return keys.join(QStringLiteral(" + "));
+    Q_UNUSED(advancedDescriptionsKey);
+    // Since PoE 3.29, Ctrl+C always returns the advanced item description.
+    // Holding the legacy "show advanced descriptions" binding can alter or
+    // suppress the copy operation instead of adding information.
+    return QStringLiteral("Ctrl + C");
 }
 
 } // namespace AptNative

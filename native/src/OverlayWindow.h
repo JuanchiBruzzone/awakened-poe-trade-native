@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QElapsedTimer>
+#include <QNetworkCookie>
 #include <QPoint>
 #include <QRect>
 #include <QTimer>
@@ -23,6 +24,7 @@ public:
                            QWidget *parent = nullptr);
 
     void load(const QUrl &url);
+    QByteArray browserUserAgent() const;
     void setInteractive(bool interactive);
     bool isInteractive() const;
     void toggleInteractive();
@@ -39,6 +41,7 @@ signals:
     void hideExclusiveWidgetRequested();
     void focusGameRequested();
     void visibilityRequested(bool visible);
+    void proxyCookieAvailable(const QNetworkCookie &cookie);
 
 private slots:
     void checkTrackedArea();

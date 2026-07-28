@@ -66,6 +66,23 @@ export default {
   QUALITY_DIVERGENT: /^Искривлённый: (.*)$/,
   QUALITY_PHANTASMAL: /^Фантомный: (.*)$/,
   AREA_LEVEL: 'Уровень области: ',
+  CHART_SULPHUR: 'Сера Мертвеца: ',
+  CHART_AREAS: {
+    'Глубоководное плато': { type: 'AbyssalPlain', discriminator: 'chart_sandy_seabed' },
+    'Поле якорей': { type: 'Anchorfield', discriminator: 'chart_sandy_seabed' },
+    'Владения Морского царя': { type: 'BrineKingsDomain', discriminator: 'chart_coral_reef' },
+    'Поросший ракушками шельф': { type: 'ClamInfestedShelf', discriminator: 'chart_coral_reef' },
+    'Водолазная отмель': { type: 'DivingShoals', discriminator: 'chart_coral_reef' },
+    'Опасные глубины': { type: 'HazardousDepths', discriminator: 'chart_sandy_seabed' },
+    'Заражённые батисферы': { type: 'InfestedBathyspheres', discriminator: 'chart_sandy_seabed' },
+    'Могила Кишары': { type: 'KisharasRest', discriminator: 'chart_sandy_seabed' },
+    'Затерянные руины': { type: 'LostRuins', discriminator: 'chart_coral_forest' },
+    'Морская пучина': { type: 'PelagicAbyss', discriminator: 'chart_coral_forest' },
+    'Донные хребты': { type: 'SeafloorRidges', discriminator: 'chart_coral_reef' },
+    'Морские колонны': { type: 'SeaPillars', discriminator: 'chart_coral_forest' },
+    'Затонувшие тотемы': { type: 'SunkenTotems', discriminator: 'chart_coral_reef' },
+    'Подводные рощи': { type: 'UnderseaGroves', discriminator: 'chart_coral_forest' }
+  },
   HEIST_WINGS_REVEALED: 'Крыльев обнаружено: ',
   HEIST_BLUEPRINT_TARGET: 'Предмет кражи: ',
   HEIST_BLUEPRINT_ENCHANTS: 'Зачарованное вооружение',
@@ -149,6 +166,14 @@ export default {
     'Прозрачный', 'Прозрачная', 'Прозрачное', 'Прозрачные', 'Прозрачные', 'Прозрачные',
     'Плодовитый', 'Плодовитая', 'Плодовитое', 'Плодовитые', 'Плодовитые', 'Плодовитые',
     'Ситаквалотля', 'Мататля', 'Такати', 'Гвателитзи', 'Пухварте'
+  ],
+  ESSENCE_MODS: [
+    'сущности',
+    'Сущностный', 'Сущностная', 'Сущностное', 'Сущностные'
+  ],
+  INFAMOUS_MODS: [
+    'рока', 'бесчестия',
+    'Бесчестный', 'Бесчестная', 'Бесчестное', 'Бесчестные'
   ],
   FOIL_UNIQUE: 'Особый уникальный предмет',
   UNMODIFIABLE: 'Неизменяемый',

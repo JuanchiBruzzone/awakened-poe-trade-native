@@ -1,14 +1,15 @@
 {
   "upstream": {
     "repository": "https://github.com/SnosMe/awakened-poe-trade.git",
-    "commit": "fa31bfbbe99e04e386b4af2d71d633e2b6823c0f"
+    "commit": "18a401efce4683a274978e3f41ce08ac8948732b"
   },
   "watchedTrees": {
-    "main/src": "63e1237cbb0fa7a3bc9b52bdf2c7963734ce0894200552ebef7ff37b225d83e3",
+    "main/src": "9aef17a77b0d2eedb48b77f463e0d3d5a5194477a458524cc47ecb3c9ffe1d7a",
     "ipc": "22c185cfc622ecdd5aa80716bafd23884ff0cf8b9c00ef3655c31921a6957401"
   },
   "capabilities": {
     "http-static-config-uploads-proxy": "implemented",
+    "browser-session-cookies-for-proxy": "implemented",
     "websocket-event-transport": "implemented",
     "config-and-file-locations": "implemented",
     "system-tray": "implemented",

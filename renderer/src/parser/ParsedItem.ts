@@ -47,6 +47,12 @@ export interface ParsedItem {
   gemLevel?: number
   imbuedGem?: boolean
   areaLevel?: number
+  chart?: {
+    type: string
+    discriminator: string
+    itemQuantity?: number
+    sulphur?: number
+  }
   talismanTier?: number
   memoryStrands?: number
   quality?: number

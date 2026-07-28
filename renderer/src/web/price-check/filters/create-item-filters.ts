@@ -151,6 +151,18 @@ export function createFilters (
         disabled: false
       }
     }
+  } else if (item.category === ItemCategory.Chart) {
+    filters.searchExact = {
+      baseType: item.chart!.type,
+      baseTypeTrade: item.chart!.type
+    }
+    filters.discriminator = {
+      trade: item.chart!.discriminator
+    }
+    filters.chartAreaLevel = {
+      value: item.areaLevel!,
+      disabled: false
+    }
   } else if (item.info.refName === 'Expedition Logbook') {
     filters.searchExact = {
       baseType: item.info.name,
@@ -240,13 +252,6 @@ export function createFilters (
     }
   }
 
-  if (item.sockets?.white) {
-    filters.whiteSockets = {
-      value: item.sockets.white,
-      disabled: false
-    }
-  }
-
   const forAdornedJewel = (
     item.rarity === ItemRarity.Magic &&
     // item.isCorrupted && -- let the buyer corrupt
@@ -328,6 +333,7 @@ export function createFilters (
     if (
       item.rarity !== ItemRarity.Unique &&
       item.category !== ItemCategory.Map &&
+      item.category !== ItemCategory.Chart &&
       item.category !== ItemCategory.Jewel && /* https://pathofexile.gamepedia.com/Jewel#Affixes */
       item.category !== ItemCategory.HeistBlueprint &&
       item.category !== ItemCategory.HeistContract &&

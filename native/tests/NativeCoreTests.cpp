@@ -1,4 +1,5 @@
 #include "ClipboardService.h"
+#include "ConfigStore.h"
 #include "DesktopLaunch.h"
 #include "EventServer.h"
 #include "GameConfigReader.h"
@@ -15,6 +16,7 @@
 #include <QFileInfo>
 #include <QJsonArray>
 #include <QJsonObject>
+#include <QNetworkCookie>
 #include <QSignalSpy>
 #include <QTemporaryDir>
 #include <QTest>
@@ -31,7 +33,7 @@ private slots:
     void hostConfigUsesSafeDefaults();
     void hostConfigReadsRendererPayload();
     void eventEnvelopeOmitsUndefinedPayload();
-    void itemCopyChordIncludesAdvancedDescriptions();
+    void itemCopyChordUsesPoe329Contract();
     void loggerStoresAndEmitsEntries();
     void gameConfigReadsAdvancedDescriptionBinding();
     void gameConfigFallsBackForMissingBinding();
@@ -43,8 +45,9 @@ private slots:
     void normalizesNativeReleaseVersions();
     void normalizesInputShortcuts();
     void mapsInputKeysToLinuxCodes();
-    void itemCopyInjectionHoldsCustomAdvancedKey();
+    void itemCopyInjectionUsesPoe329Contract();
     void eventServerShutsDownWithConnectedClient();
+    void eventServerImportsOfficialBrowserCookies();
     void desktopLaunchRemovesPrivateAppImageEnvironment();
     void runtimePathsFindBundledKWinBridge();
 };
@@ -111,21 +114,20 @@ void NativeCoreTests::eventEnvelopeOmitsUndefinedPayload()
     QCOMPARE(withPayload.value(QStringLiteral("payload")).toObject(), payload);
 }
 
-void NativeCoreTests::itemCopyChordIncludesAdvancedDescriptions()
+void NativeCoreTests::itemCopyChordUsesPoe329Contract()
 {
     QCOMPARE(advancedItemCopyChord(QStringLiteral("Alt")),
-             QStringLiteral("Ctrl + Alt + C"));
+             QStringLiteral("Ctrl + C"));
     QCOMPARE(advancedItemCopyChord(QStringLiteral("Ctrl + D")),
-             QStringLiteral("Ctrl + D + C"));
+             QStringLiteral("Ctrl + C"));
     QCOMPARE(advancedItemCopyChord(QString{}), QStringLiteral("Ctrl + C"));
 }
 
-void NativeCoreTests::itemCopyInjectionHoldsCustomAdvancedKey()
+void NativeCoreTests::itemCopyInjectionUsesPoe329Contract()
 {
     QCOMPARE(InputInjector::shortcutTokens(
                  advancedItemCopyChord(QStringLiteral("Ctrl + D"))),
-             QStringList({QStringLiteral("Ctrl"), QStringLiteral("D"),
-                          QStringLiteral("C")}));
+             QStringList({QStringLiteral("Ctrl"), QStringLiteral("C")}));
 }
 
 void NativeCoreTests::loggerStoresAndEmitsEntries()
@@ -326,6 +328,32 @@ void NativeCoreTests::eventServerShutsDownWithConnectedClient()
     server.reset();
     QVERIFY(client.state() == QAbstractSocket::UnconnectedState ||
             client.waitForDisconnected(1000));
+}
+
+void NativeCoreTests::eventServerImportsOfficialBrowserCookies()
+{
+    QTemporaryDir directory;
+    QVERIFY(directory.isValid());
+    Logger logger;
+    ConfigStore store(&logger);
+    EventServer server(directory.path(), &store, &logger);
+
+    QNetworkCookie clearance(
+        QByteArrayLiteral("cf_clearance"), QByteArrayLiteral("token"));
+    clearance.setDomain(QStringLiteral(".pathofexile.com"));
+    clearance.setPath(QStringLiteral("/"));
+    clearance.setSecure(true);
+    QVERIFY(server.importBrowserCookie(clearance));
+
+    QNetworkCookie korean(
+        QByteArrayLiteral("POESESSID"), QByteArrayLiteral("token"));
+    korean.setDomain(QStringLiteral("poe.kakaogames.com"));
+    QVERIFY(server.importBrowserCookie(korean));
+
+    QNetworkCookie untrusted(
+        QByteArrayLiteral("session"), QByteArrayLiteral("token"));
+    untrusted.setDomain(QStringLiteral(".example.com"));
+    QVERIFY(!server.importBrowserCookie(untrusted));
 }
 
 void NativeCoreTests::desktopLaunchRemovesPrivateAppImageEnvironment()

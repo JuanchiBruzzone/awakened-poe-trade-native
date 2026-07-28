@@ -5,7 +5,6 @@ export interface StatMatcher {
   advanced?: string
   negate?: true
   value?: number
-  oils?: string // Amulet anointment
 }
 
 export enum StatBetter {
@@ -20,7 +19,7 @@ export interface Stat {
   matchers: StatMatcher[]
   better: StatBetter
   fromAreaMods?: 'yes' | 'ubermap_exclusive' | 'heist_exclusive'
-  anointments?: Array<{ roll: number, oils: string }> // Ring anointments
+  anointments?: Array<{ roll: number, oils: string }>
   trade: {
     inverted?: true
     option?: true
@@ -175,6 +174,11 @@ export interface TranslationDict {
   QUALITY_DIVERGENT: RegExp
   QUALITY_PHANTASMAL: RegExp
   AREA_LEVEL: string
+  CHART_SULPHUR: string
+  CHART_AREAS: Record<string, {
+    type: string
+    discriminator: string
+  }>
   HEIST_WINGS_REVEALED: string
   HEIST_BLUEPRINT_TARGET: string
   HEIST_BLUEPRINT_ENCHANTS: string
@@ -226,6 +230,8 @@ export interface TranslationDict {
   DELVE_MODS: string[]
   VEILED_MODS: string[]
   INCURSION_MODS: string[]
+  ESSENCE_MODS: string[]
+  INFAMOUS_MODS: string[]
   FOIL_UNIQUE: string
   UNMODIFIABLE: string
   FOULBORN_NAME: RegExp

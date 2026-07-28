@@ -19,6 +19,17 @@ const VALDO_LETHAL_STATS = [
 
 export function mapProps (ctx: FiltersCreationContext): void {
   const { item } = ctx
+
+  if (item.chart?.itemQuantity) {
+    ctx.filters.push(propToFilter({
+      ref: 'Item Quantity: +#%',
+      tradeId: 'item.map_item_quantity',
+      roll: { min: 0, max: Number.MAX_SAFE_INTEGER, value: item.chart.itemQuantity },
+      sources: [],
+      disabled: false
+    }, ctx))
+  }
+
   if (!item.map || item.mapBlighted || item.mapCompletionReward || item.rarity === ItemRarity.Unique) return
 
   const hasMoreDrops = Boolean(item.map.moreMaps || item.map.moreScarabs || item.map.moreCurrency || item.map.moreDivCards)

@@ -8,6 +8,7 @@
 #include <QList>
 #include <QMap>
 #include <QNetworkAccessManager>
+#include <QNetworkCookie>
 #include <QObject>
 #include <QPointer>
 #include <QTcpServer>
@@ -35,6 +36,8 @@ public:
     quint16 port() const;
     QUrl appUrl() const;
     void setUpdaterState(const QJsonObject &state);
+    void setProxyUserAgent(const QByteArray &userAgent);
+    bool importBrowserCookie(const QNetworkCookie &cookie);
 
     void broadcast(const QJsonObject &event);
     void sendToLastActive(const QJsonObject &event);
@@ -87,6 +90,9 @@ private:
     QHash<QTcpSocket *, ClientState> m_clients;
     QPointer<QTcpSocket> m_lastActive;
     QNetworkAccessManager m_network;
+    QByteArray m_proxyUserAgent =
+        QByteArrayLiteral("Awakened-PoE-Trade-Native/") +
+        QByteArray(APT_NATIVE_VERSION);
     QJsonObject m_updaterState{
         {QStringLiteral("state"), QStringLiteral("initial")}
     };

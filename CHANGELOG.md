@@ -3,6 +3,35 @@
 All notable native-port changes are documented here. Shared Awakened PoE Trade
 changes remain documented by the upstream project.
 
+## 3.29.102-native.1
+
+Native integration of Awakened PoE Trade 3.29.102.
+
+### Added
+
+- Upstream 3.29 item, modifier, translation, icon, and parser data, including
+  Expedition Logbooks and the new league content.
+- Native price-check support for all current Allflame Chart bases and areas,
+  with localized names, official trade discriminators, Chart modifiers, item
+  quantity, and toggleable Area Level filtering.
+
+### Changed
+
+- Updated native item capture for Path of Exile 3.29, where plain `Ctrl+C`
+  returns the complete advanced item description.
+- Kept the native trade proxy aligned with the embedded browser session so
+  official-site challenge cookies and the browser user agent are reused.
+- Updated the supported Korean trade host to `poe.kakaogames.com`.
+
+### Fixed
+
+- Preserved current-league discovery and trade requests when the official site
+  presents its browser challenge.
+- Preserved explicit Chart modifiers for both Magic and Rare Charts and exposed
+  unknown future Chart modifiers instead of silently dropping them.
+- Kept Chart Item Quantity separate from Dead Man's Sulphur when constructing
+  official trade searches.
+
 ## 3.28.104-native.6
 
 ### Fixed

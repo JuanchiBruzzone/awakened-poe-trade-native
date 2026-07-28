@@ -78,6 +78,7 @@ export interface ItemFilters {
     disabled: boolean
   }
   areaLevel?: FilterNumeric
+  chartAreaLevel?: FilterNumeric
   heistWingsRevealed?: FilterNumeric
   sentinelCharge?: FilterNumeric
   trade: {
@@ -183,5 +184,7 @@ export enum FilterTag {
   Warlord = 'explicit-warlord',
   Delve = 'explicit-delve',
   Unveiled = 'explicit-veiled',
-  Incursion = 'explicit-incursion'
+  Incursion = 'explicit-incursion',
+  Infamous = 'explicit-infamous',
+  Essence = 'explicit-essence'
 }

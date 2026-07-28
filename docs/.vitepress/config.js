@@ -19,7 +19,7 @@ export default defineConfig({
     }
   },
   themeConfig: {
-    appVersion: '3.28.104-native.2',
+    appVersion: '3.29.102-native.1',
     github: {
       releasesUrl: 'https://github.com/JuanchiBruzzone/awakened-poe-trade-native/releases'
     },
