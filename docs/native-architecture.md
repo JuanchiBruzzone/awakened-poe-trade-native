@@ -56,6 +56,12 @@ mode is keyboard- and mouse-transparent. The surface deliberately uses
 Exile keeps keyboard focus and Plasma does not reveal its panel above the
 fullscreen game.
 
+Editable overlay fields use temporary KDE global accelerators instead of
+Wayland keyboard focus. The renderer applies captured text, selection,
+navigation, and clipboard operations to the field selected by the pointer.
+Escape is registered only while the overlay is interactive. These temporary
+bindings are removed as soon as editing or overlay interaction ends.
+
 The renderer's existing `track-area` event is preserved. On Plasma Wayland,
 the KWin bridge supplies compositor-native cursor coordinates because an
 unfocused client cannot reliably poll the global pointer. While the configured

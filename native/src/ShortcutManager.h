@@ -27,6 +27,9 @@ public:
     void cancelLetterCapture();
     void beginNumberCapture(const QString &token);
     void cancelNumberCapture();
+    void beginTextCapture(const QString &token);
+    void cancelTextCapture();
+    void setOverlayInteractive(bool interactive);
 
 signals:
     void actionTriggered(const QJsonObject &action,
@@ -35,6 +38,8 @@ signals:
     void overlayToggleTriggered(const QString &triggeringShortcut);
     void letterCaptured(const QString &token, const QString &letter);
     void numberCaptured(const QString &token, const QString &key);
+    void textCaptured(const QString &token, const QString &key);
+    void overlayEscapeTriggered();
 
 private:
     static QKeySequence parseSequence(const QString &shortcut);
@@ -50,6 +55,10 @@ private:
     QString m_captureToken;
     QList<QAction *> m_numberCaptureActions;
     QString m_numberCaptureToken;
+    QList<QAction *> m_textCaptureActions;
+    QString m_textCaptureToken;
+    QAction *m_overlayEscapeAction = nullptr;
+    bool m_overlayInteractive = false;
     QTimer m_captureTimer;
 };
 

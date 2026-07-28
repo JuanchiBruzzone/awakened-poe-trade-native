@@ -4,6 +4,7 @@
 #include "RuntimePaths.h"
 
 #include <QApplication>
+#include <QClipboard>
 #include <QCursor>
 #include <QDateTime>
 #include <QDBusConnection>
@@ -108,6 +109,23 @@ NativeHost::NativeHost(NativeOptions options, QObject *parent)
             QJsonObject{{QStringLiteral("token"), token},
                         {QStringLiteral("key"), key}}));
     });
+    connect(&m_shortcuts, &ShortcutManager::textCaptured,
+            this, [this](const QString &token, const QString &key) {
+        QJsonObject payload{{QStringLiteral("token"), token},
+                            {QStringLiteral("key"), key}};
+        if (key == QStringLiteral("Paste")) {
+            payload.insert(QStringLiteral("text"),
+                           QGuiApplication::clipboard()->text());
+        }
+        m_server.broadcast(makeEvent(
+            QStringLiteral("MAIN->CLIENT::text-captured"), payload));
+    });
+    connect(&m_shortcuts, &ShortcutManager::overlayEscapeTriggered,
+            this, [this] {
+        if (!m_overlay || !m_overlay->isInteractive()) return;
+        m_overlay->focusGame();
+        sendFocusState(false);
+    });
     connect(&m_inputMonitor, &InputEventMonitor::wheelRotated,
             this, [this](int rotation) {
         if (!m_hostConfig.stashScroll || !m_gameWindow.isGameActive() ||
@@ -183,6 +201,7 @@ bool NativeHost::start()
             m_shortcuts.setGameActive(
                 !interactive && m_gameWindow.isGameActive(),
                 m_gameWindow.isKnown());
+            m_shortcuts.setOverlayInteractive(interactive);
             sendFocusState(false);
         });
         connect(m_overlay, &OverlayWindow::hideExclusiveWidgetRequested, this, [this] {
@@ -323,6 +342,20 @@ void NativeHost::handleEvent(const QString &name, const QJsonValue &payload)
     }
     if (name == QStringLiteral("CLIENT->MAIN::cancel-number-capture")) {
         m_shortcuts.cancelNumberCapture();
+        return;
+    }
+    if (name == QStringLiteral("CLIENT->MAIN::begin-text-capture")) {
+        m_shortcuts.beginTextCapture(
+            payload.toObject().value(QStringLiteral("token")).toString());
+        return;
+    }
+    if (name == QStringLiteral("CLIENT->MAIN::cancel-text-capture")) {
+        m_shortcuts.cancelTextCapture();
+        return;
+    }
+    if (name == QStringLiteral("CLIENT->MAIN::set-clipboard-text")) {
+        QGuiApplication::clipboard()->setText(
+            payload.toObject().value(QStringLiteral("text")).toString());
         return;
     }
     if (name == QStringLiteral("CLIENT->MAIN::save-config")) {

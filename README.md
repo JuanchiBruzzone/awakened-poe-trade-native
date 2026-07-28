@@ -62,6 +62,7 @@ upstream project and remains dependent on its continued contributions.
 - Native Wayland layer-shell overlay above fullscreen Path of Exile
 - Price checking with quick and locked modes
 - KDE global shortcuts with editable Ctrl, Alt, or Shift price-check bindings
+- Passive native text and number entry without taking focus from the game
 - System tray integration
 - Native clipboard capture and reliable Proton/Wayland command entry
 - KWin focus and cursor bridge without taking focus away from the game

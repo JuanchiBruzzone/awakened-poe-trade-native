@@ -20,6 +20,14 @@
   <url type="bugtracker">https://github.com/JuanchiBruzzone/awakened-poe-trade-native/issues</url>
   <url type="vcs-browser">https://github.com/JuanchiBruzzone/awakened-poe-trade-native</url>
   <releases>
+    <release version="3.28.104-native.6" date="2026-07-28">
+      <description>
+        <p>
+          Adds passive text-field editing and Escape handling without giving
+          the overlay keyboard focus or revealing Plasma's taskbar.
+        </p>
+      </description>
+    </release>
     <release version="3.28.104-native.5" date="2026-07-27">
       <description>
         <p>

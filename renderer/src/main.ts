@@ -5,13 +5,17 @@ import * as Data from './assets/data'
 import { initConfig, AppConfig } from './web/Config'
 import { Host } from './web/background/IPC'
 import { installNativeNumberInputCapture } from './web/native-number-input'
+import { installNativeTextInputCapture } from './web/native-text-input'
 
 ;(async function () {
   await initConfig()
   const i18nPlugin = await I18n.init(AppConfig().language)
   await Data.init(AppConfig().language)
   await Host.init()
-  installNativeNumberInputCapture()
+  if (Host.isNative) {
+    installNativeNumberInputCapture()
+    installNativeTextInputCapture()
+  }
 
   watch(() => AppConfig().language, async () => {
     await Data.loadForLang(AppConfig().language)

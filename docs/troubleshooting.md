@@ -89,6 +89,16 @@ pgrep -af awakened-poe-trade-native
 Only one native instance should be active. If a locally modified build requests
 keyboard interactivity from layer-shell, restore the official build.
 
+## Cannot type in an overlay text field
+
+Click the field once before typing. The native host temporarily captures
+standard Latin letters, digits, common punctuation, navigation keys, and
+copy/cut/paste while that field is active. It does not give the overlay Wayland
+keyboard focus, so PoE stays fullscreen and Plasma's taskbar remains hidden.
+
+IME composition and dead-key input are not currently supported by the passive
+capture bridge. Paste composed or non-Latin text with `Ctrl+V` instead.
+
 ## Quick Price Check closes instantly
 
 The KWin bridge supplies cursor movement while PoE owns the Wayland pointer.

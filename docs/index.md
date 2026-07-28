@@ -18,6 +18,8 @@ Qt/KDE host.
   panel or taking keyboard focus.
 - KDE global shortcuts, a system tray, native clipboard handling, and reliable
   Proton/Wayland input.
+- Passive text and number entry in overlay fields without activating the
+  layer-shell surface.
 - Quick and locked price-check modes with compositor cursor tracking.
 - Startup diagnostics for required host tools and PoE window recognition.
 - A self-loading bundled KWin bridge, native Heist OCR, automatic AppImage

@@ -3,6 +3,15 @@
 All notable native-port changes are documented here. Shared Awakened PoE Trade
 changes remain documented by the upstream project.
 
+## 3.28.104-native.6
+
+### Fixed
+
+- Added passive native text entry for settings and other overlay text fields,
+  including selection, navigation, copy, cut, paste, and Tab traversal.
+- Made Escape close an interactive overlay without granting the layer-shell
+  surface keyboard focus or revealing Plasma's taskbar.
+
 ## 3.28.104-native.5
 
 ### Fixed

@@ -23,11 +23,13 @@ ShortcutManager::ShortcutManager(Logger *logger, bool stealConflicts, QObject *p
     connect(&m_captureTimer, &QTimer::timeout, this, [this] {
         cancelLetterCapture();
         cancelNumberCapture();
+        cancelTextCapture();
     });
 }
 
 ShortcutManager::~ShortcutManager()
 {
+    setOverlayInteractive(false);
     clear();
 }
 
@@ -84,6 +86,7 @@ void ShortcutManager::clear()
 {
     cancelLetterCapture();
     cancelNumberCapture();
+    cancelTextCapture();
     for (QAction *action : std::as_const(m_actions)) {
         KGlobalAccel::self()->removeAllShortcuts(action);
         action->deleteLater();
@@ -95,6 +98,7 @@ void ShortcutManager::beginLetterCapture(const QString &token)
 {
     cancelLetterCapture();
     cancelNumberCapture();
+    cancelTextCapture();
     if (token.isEmpty()) return;
     m_captureToken = token;
 
@@ -132,12 +136,13 @@ void ShortcutManager::beginNumberCapture(const QString &token)
 {
     cancelLetterCapture();
     cancelNumberCapture();
+    cancelTextCapture();
     if (token.isEmpty()) return;
     m_numberCaptureToken = token;
 
     QStringList keys{
         QStringLiteral("Backspace"), QStringLiteral("Delete"),
-        QStringLiteral("Enter"), QStringLiteral("Escape"),
+        QStringLiteral("Enter"),
         QStringLiteral("."), QStringLiteral("-")
     };
     for (int digit = 0; digit <= 9; ++digit) {
@@ -175,6 +180,81 @@ void ShortcutManager::beginNumberCapture(const QString &token)
             .arg(m_numberCaptureActions.size()));
 }
 
+void ShortcutManager::beginTextCapture(const QString &token)
+{
+    cancelLetterCapture();
+    cancelNumberCapture();
+    cancelTextCapture();
+    if (token.isEmpty()) return;
+    m_textCaptureToken = token;
+
+    QList<QPair<QString, QString>> keys{
+        {QStringLiteral("Backspace"), QStringLiteral("Backspace")},
+        {QStringLiteral("Delete"), QStringLiteral("Delete")},
+        {QStringLiteral("Enter"), QStringLiteral("Enter")},
+        {QStringLiteral("Tab"), QStringLiteral("Tab")},
+        {QStringLiteral("Left"), QStringLiteral("ArrowLeft")},
+        {QStringLiteral("Right"), QStringLiteral("ArrowRight")},
+        {QStringLiteral("Home"), QStringLiteral("Home")},
+        {QStringLiteral("End"), QStringLiteral("End")},
+        {QStringLiteral("Shift+Left"), QStringLiteral("Shift+ArrowLeft")},
+        {QStringLiteral("Shift+Right"), QStringLiteral("Shift+ArrowRight")},
+        {QStringLiteral("Ctrl+A"), QStringLiteral("SelectAll")},
+        {QStringLiteral("Ctrl+C"), QStringLiteral("Copy")},
+        {QStringLiteral("Ctrl+X"), QStringLiteral("Cut")},
+        {QStringLiteral("Ctrl+V"), QStringLiteral("Paste")},
+        {QStringLiteral("Space"), QStringLiteral(" ")},
+        {QStringLiteral("."), QStringLiteral(".")},
+        {QStringLiteral(","), QStringLiteral(",")},
+        {QStringLiteral("-"), QStringLiteral("-")},
+        {QStringLiteral("Shift+-"), QStringLiteral("_")},
+        {QStringLiteral("/"), QStringLiteral("/")},
+        {QStringLiteral(";"), QStringLiteral(";")},
+        {QStringLiteral("Shift+;"), QStringLiteral(":")},
+        {QStringLiteral("="), QStringLiteral("=")},
+        {QStringLiteral("Shift+="), QStringLiteral("+")},
+        {QStringLiteral("Shift+9"), QStringLiteral("(")},
+        {QStringLiteral("Shift+0"), QStringLiteral(")")},
+        {QStringLiteral("["), QStringLiteral("[")},
+        {QStringLiteral("]"), QStringLiteral("]")},
+        {QStringLiteral("'"), QStringLiteral("'")}
+    };
+    for (QChar key = QLatin1Char('A'); key <= QLatin1Char('Z');
+         key = QChar(key.unicode() + 1)) {
+        keys.append({QString(key), QString(key).toLower()});
+        keys.append({QStringLiteral("Shift+") + key, QString(key)});
+    }
+    for (int digit = 0; digit <= 9; ++digit) {
+        const QString key = QString::number(digit);
+        keys.append({key, key});
+    }
+
+    for (const auto &[sequence, key] : std::as_const(keys)) {
+        auto *action = new QAction(this);
+        action->setObjectName(
+            QStringLiteral("apt-native-text-capture-%1-%2")
+                .arg(sequence).arg(m_textCaptureActions.size()));
+        action->setText(
+            QStringLiteral("Awakened PoE Trade: Capture text %1").arg(sequence));
+        connect(action, &QAction::triggered, this, [this, key] {
+            if (m_textCaptureToken.isEmpty()) return;
+            emit textCaptured(m_textCaptureToken, key);
+            m_captureTimer.start();
+        });
+        if (registerAction(action, parseSequence(sequence))) {
+            action->setEnabled(true);
+            m_textCaptureActions.append(action);
+        } else {
+            action->deleteLater();
+        }
+    }
+
+    m_captureTimer.start();
+    m_logger->write(
+        QStringLiteral("debug [Shortcuts] Text capture armed with %1 keys.")
+            .arg(m_textCaptureActions.size()));
+}
+
 void ShortcutManager::cancelLetterCapture()
 {
     m_captureTimer.stop();
@@ -195,6 +275,54 @@ void ShortcutManager::cancelNumberCapture()
         action->deleteLater();
     }
     m_numberCaptureActions.clear();
+}
+
+void ShortcutManager::cancelTextCapture()
+{
+    m_captureTimer.stop();
+    m_textCaptureToken.clear();
+    for (QAction *action : std::as_const(m_textCaptureActions)) {
+        KGlobalAccel::self()->removeAllShortcuts(action);
+        action->deleteLater();
+    }
+    m_textCaptureActions.clear();
+}
+
+void ShortcutManager::setOverlayInteractive(bool interactive)
+{
+    if (m_overlayInteractive == interactive) return;
+    m_overlayInteractive = interactive;
+    if (!interactive) {
+        if (m_overlayEscapeAction) {
+            KGlobalAccel::self()->removeAllShortcuts(m_overlayEscapeAction);
+            m_overlayEscapeAction->deleteLater();
+            m_overlayEscapeAction = nullptr;
+        }
+        cancelTextCapture();
+        cancelNumberCapture();
+        return;
+    }
+
+    auto *action = new QAction(this);
+    action->setObjectName(QStringLiteral("apt-native-overlay-escape"));
+    action->setText(QStringLiteral("Awakened PoE Trade: Close overlay"));
+    connect(action, &QAction::triggered, this, [this] {
+        if (!m_numberCaptureToken.isEmpty()) {
+            const QString token = m_numberCaptureToken;
+            emit numberCaptured(token, QStringLiteral("Escape"));
+            cancelNumberCapture();
+            return;
+        }
+        emit overlayEscapeTriggered();
+    });
+    if (registerAction(action, parseSequence(QStringLiteral("Escape")))) {
+        action->setEnabled(true);
+        m_overlayEscapeAction = action;
+    } else {
+        action->deleteLater();
+        m_logger->write(QStringLiteral(
+            "warn [Shortcuts] Escape could not be registered for the overlay."));
+    }
 }
 
 void ShortcutManager::setGameActive(bool active, bool known)

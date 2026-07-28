@@ -78,6 +78,10 @@ class HostTransport {
   get isElectron () {
     return navigator.userAgent.includes('Electron')
   }
+
+  get isNative () {
+    return navigator.userAgent.includes('AwakenedPoETradeNative/')
+  }
 }
 
 export const MainProcess = new HostTransport()

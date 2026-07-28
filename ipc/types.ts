@@ -81,6 +81,10 @@ export type IpcEvent =
   IpcBeginNumberCapture |
   IpcCancelNumberCapture |
   IpcNumberCaptured |
+  IpcBeginTextCapture |
+  IpcCancelTextCapture |
+  IpcTextCaptured |
+  IpcSetClipboardText |
   IpcConfigChanged |
   IpcUserAction
 
@@ -161,6 +165,28 @@ type IpcNumberCaptured =
   Event<'MAIN->CLIENT::number-captured', {
     token: string
     key: string
+  }>
+
+type IpcBeginTextCapture =
+  Event<'CLIENT->MAIN::begin-text-capture', {
+    token: string
+  }>
+
+type IpcCancelTextCapture =
+  Event<'CLIENT->MAIN::cancel-text-capture', {
+    token: string
+  }>
+
+type IpcTextCaptured =
+  Event<'MAIN->CLIENT::text-captured', {
+    token: string
+    key: string
+    text?: string
+  }>
+
+type IpcSetClipboardText =
+  Event<'CLIENT->MAIN::set-clipboard-text', {
+    text: string
   }>
 
 type IpcLogEntry =
