@@ -20,6 +20,15 @@
   <url type="bugtracker">https://github.com/JuanchiBruzzone/awakened-poe-trade-native/issues</url>
   <url type="vcs-browser">https://github.com/JuanchiBruzzone/awakened-poe-trade-native</url>
   <releases>
+    <release version="3.29.102-native.2" date="2026-07-28">
+      <description>
+        <p>
+          Fixes AppImage startup on glibc 2.43 systems by pinning a compatible
+          Fortran runtime and validating the glibc requirement of every
+          bundled library during packaging.
+        </p>
+      </description>
+    </release>
     <release version="3.29.102-native.1" date="2026-07-28">
       <description>
         <p>

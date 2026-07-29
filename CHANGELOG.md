@@ -3,6 +3,15 @@
 All notable native-port changes are documented here. Shared Awakened PoE Trade
 changes remain documented by the upstream project.
 
+## 3.29.102-native.2
+
+### Fixed
+
+- Replaced the rolling-release `libgfortran` bundled by the AppImage packager
+  with a checksum-pinned glibc-compatible runtime.
+- Added packaging validation that rejects any bundled library requiring glibc
+  newer than the supported 2.43 baseline.
+
 ## 3.29.102-native.1
 
 Native integration of Awakened PoE Trade 3.29.102.

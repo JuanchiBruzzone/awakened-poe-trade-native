@@ -100,6 +100,54 @@ fi
   --icon-file "$APP_DIR/usr/share/icons/hicolor/128x128/apps/awakened-poe-trade-native.png" \
   --plugin qt
 
+# Arch's rolling GCC runtime can be built against a glibc newer than the rest
+# of the AppImage. Pin the Fortran runtime used by OpenCV/LAPACK to Ubuntu
+# 22.04's glibc-2.34-compatible build instead.
+COMPAT_DIRECTORY="$(mktemp -d)"
+trap 'rm -rf -- "$COMPAT_DIRECTORY"' EXIT
+GFORTRAN_DEB="$COMPAT_DIRECTORY/libgfortran5.deb"
+QUADMATH_DEB="$COMPAT_DIRECTORY/libquadmath0.deb"
+curl -fsSL \
+  https://archive.ubuntu.com/ubuntu/pool/main/g/gcc-12/libgfortran5_12.3.0-1ubuntu1~22.04.3_amd64.deb \
+  -o "$GFORTRAN_DEB"
+curl -fsSL \
+  https://archive.ubuntu.com/ubuntu/pool/main/g/gcc-12/libquadmath0_12.3.0-1ubuntu1~22.04.3_amd64.deb \
+  -o "$QUADMATH_DEB"
+printf '%s  %s\n%s  %s\n' \
+  14dbb269458f60ca64af646c9300b8b85dd962ddbb434ba362062a54c07c4db6 "$GFORTRAN_DEB" \
+  c4c59e67e76674c8c494ce5e0415b71d770a759b48893c0d3cbabddceeb690b2 "$QUADMATH_DEB" \
+  | sha256sum -c -
+install -d "$COMPAT_DIRECTORY/root"
+for package in "$GFORTRAN_DEB" "$QUADMATH_DEB"; do
+  ar p "$package" data.tar.zst | bsdtar -xf - -C "$COMPAT_DIRECTORY/root"
+done
+for library in libgfortran.so.5 libgfortran.so.5.0.0 libquadmath.so.0 libquadmath.so.0.0.0; do
+  cp -a \
+    "$COMPAT_DIRECTORY/root/usr/lib/x86_64-linux-gnu/$library" \
+    "$APP_DIR/usr/lib/$library"
+done
+
+# The current Qt/KDE bundle targets glibc 2.43. Reject a single accidentally
+# newer dependency before producing another AppImage that passes CI but cannot
+# start on the supported rolling-release baseline.
+while IFS= read -r -d '' binary; do
+  if ! readelf -h "$binary" >/dev/null 2>&1; then
+    continue
+  fi
+  required="$(
+    readelf --version-info "$binary" \
+      | sed -nE 's/.*GLIBC_([0-9.]+).*/\1/p' \
+      | sort -Vu \
+      | tail -1
+  )"
+  if [[ -n "$required" ]] &&
+     [[ "$(printf '%s\n' 2.43 "$required" | sort -V | tail -1)" != "2.43" ]]; then
+    printf 'error: %s requires glibc %s (maximum supported is 2.43)\n' \
+      "$binary" "$required" >&2
+    exit 1
+  fi
+done < <(find "$APP_DIR/usr" -type f -print0)
+
 # linuxdeploy-plugin-qt does not recognize Qt 6's Wayland client-buffer
 # integration category, even when its plugin root is supplied through qmake.
 # Without this plugin the layer-shell surface maps and accepts shortcuts but
